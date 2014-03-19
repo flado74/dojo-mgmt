@@ -1,0 +1,27 @@
+Use DataDict.pkg
+
+Open SysTable
+
+Class cSysTableDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to SysTable.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Class_Name Field SysTable.RIBBON_MENU to "dbCheckBox"
+        Set Field_Checkbox_Values Field SysTable.RIBBON_MENU to "1" "0"
+
+        Set Field_Class_Name Field SysTable.SHOW_TABS to "dbCheckBox"
+        Set Field_Checkbox_Values Field SysTable.SHOW_TABS to "1" "0"
+
+        Set Field_Checkbox_Values Field SysTable.MAXIMIZE_VIEWS to "1" "0"
+        Set Field_Class_Name Field SysTable.MAXIMIZE_VIEWS to "dbCheckBox"
+
+    End_Procedure
+
+End_Class

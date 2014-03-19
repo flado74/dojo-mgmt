@@ -1,0 +1,78 @@
+Use DataDict.pkg
+
+Open Teachers
+Open Dojos
+Open SysTable
+Open RankHistory
+
+Object oTeacherType is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "Shibu-cho"
+        Send Add_Table_Value "1" "Dojo-cho"
+        Send Add_Table_Value "2" "Kancho"
+    End_Procedure
+End_Object
+
+Object oRankTeacher is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Rokkyu"
+        Send Add_Table_Value "2" "Gokyu"
+        Send Add_Table_Value "3" "Yonkyu"
+        Send Add_Table_Value "4" "Sankyu"
+        Send Add_Table_Value "5" "Nikyu"
+        Send Add_Table_Value "6" "Ikkyu"
+        Send Add_Table_Value "7" "Shodan"
+        Send Add_Table_Value "8" "Nidan"
+        Send Add_Table_Value "9" "Sandan"
+        Send Add_Table_Value "10" "Yondan"
+        Send Add_Table_Value "11" "Godan"
+        Send Add_Table_Value "12" "Rokudan"
+        Send Add_Table_Value "13" "Nanadan"
+        Send Add_Table_Value "14" "Hachidan"
+        Send Add_Table_Value "15" "Kudan"
+        Send Add_Table_Value "16" "Kancho"
+    End_Procedure
+End_Object
+
+Register_Object Dojos_sl
+Register_Object Teachers_sl
+
+Class cTeachersDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to Teachers.File_Number
+
+        Set Add_Server_File to Dojos.File_Number
+
+        Set Add_System_File to SysTable.File_Number DD_Lock_On_All
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field Teachers.ID to File_Field SysTable.TEACHERS_ID
+
+        Set Field_Prompt_Object Field Teachers.Name to Teachers_sl
+
+        Set Field_Value_Table Field Teachers.Type to oTeacherType
+        Set Field_Class_Name Field Teachers.Type to "dbComboForm"
+
+        Set Field_Value_Table Field Teachers.Rank to oRankTeacher
+        Set Field_Class_Name Field Teachers.Rank to "dbComboForm"
+
+        Set Field_Prompt_Object Field Teachers.Dojo to Dojos_sl
+
+    End_Procedure
+
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+Use Teachers.sl
+Use Dojos.sl
+#ENDIF

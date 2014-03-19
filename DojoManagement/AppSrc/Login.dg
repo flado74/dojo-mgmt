@@ -1,0 +1,124 @@
+Use Windows.pkg
+Use dfBitmap.pkg
+
+Object oLogin is a ModalPanel
+    Set Border_Style to Border_Thick
+    Set Label to "Login"
+    Set Location to 2 2
+    Set Size to 103 212
+    Set piMinSize to 73 183
+    Set Locate_Mode to Center_On_Screen
+
+    Object oUserIDForm is a Form
+        Set Label to "User ID:"
+        Set Size to 13 129
+        Set Location to 43 79
+        Set Label_Col_Offset to 65
+		Set peAnchors to anTopLeftRight
+
+        //OnChange will be called on every changed character
+        //Procedure OnChange
+        //    String sValue
+        //
+        //    Get Value to sValue
+        //End_Procedure
+
+    End_Object
+
+    Object oPwdForm is a Form
+        Set Label to "Password:"
+        Set Size to 13 129
+        Set Location to 63 79
+        Set Label_Col_Offset to 65
+        Set Password_State to TRUE
+		Set peAnchors to anTopLeftRight
+
+        //OnChange will be called on every changed character
+        //Procedure OnChange
+        //    String sValue
+        //
+        //    Get Value to sValue
+        //End_Procedure
+
+    End_Object
+
+    Object oOK_btn is a Button
+        Set Label to "&OK"
+        Set Location to 85 103
+        Set peAnchors to anBottomRight
+        Set Default_State to True
+
+        Procedure OnClick
+            Boolean bOK
+
+            // Validate_UserInformation is a method you should define
+            // using the criteria you need to validate user_ids and passwords
+            // in your program
+            Get Validate_UserInformation to bOK
+            If (bOK) Begin
+                Send Stop_UI
+            End
+            Else Begin
+                Send UserError "UserID or Password is incorrect!"
+            End
+        End_Procedure
+    End_Object
+
+    Object oCancel_btn is a Button
+        Set Label to "&Cancel"
+        Set Location to 85 158
+        Set peAnchors to anBottomRight
+
+        Procedure OnClick
+            Send Close_Panel
+        End_Procedure
+    End_Object
+
+    Object oBitmapContainer1 is a BitmapContainer
+        Set Size to 37 54
+        Set Location to 2 5
+        Set Bitmap to "ninja.ico"
+    End_Object
+
+    Object oGroup1 is a Group
+        Set Size to 38 149
+        Set Location to 2 60
+        Set Label to "Welcome to Dojo Management"
+
+        Object oTextBox1 is a TextBox
+            Set Label to "Please Login to manage your Dojo - A tool for Jinenkan Dojo-cho!"
+            Set Auto_Size_State to False
+            Set Size to 16 111
+            Set Location to 13 8
+            Set Justification_Mode to JMode_Left
+        End_Object
+    End_Object
+
+    // Change this method in order to validate
+    // the user and password typed in the forms of this dialog
+    Function Validate_UserInformation Returns Boolean
+        Boolean bValid
+        String sUserID sPwd
+
+        // Get and Validate user id
+        Get value of oUserIDForm to sUserID
+
+        // Get and Validate password
+        Get value of oPwdForm to sPwd
+        
+        If (sUserID <> "") Begin
+            Clear Security
+            Move sUserID to Security.UserID
+            Find eq Security by Index.1
+            Move (Found) to bValid
+        End
+        If ((sPwd <> "") and bValid) Begin
+            Move (sPwd = Security.Password) to bValid
+        End
+        Function_Return bValid
+    End_Function
+
+    On_Key Key_Alt+Key_O Send KeyAction of oOk_btn
+    On_Key Key_Alt+Key_C Send KeyAction of oCancel_btn
+End_Object
+

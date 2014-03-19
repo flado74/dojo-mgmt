@@ -1,0 +1,530 @@
+Use DFAllEnt.pkg
+Global_Variable Handle ghoMessageBar
+Use cCJStandardCommandBarSystem.pkg
+Use cCJSkinFramework.pkg
+Use cCJCommandBarSystem.pkg
+
+Object oHtmlHelp is a cHtmlHelp
+End_Object
+
+Object oApplication is a cApplication
+    Set peHelpType to htHtmlHelp
+End_Object
+
+Open SysTable
+Open Security
+Use Login.dg
+Use cDojoCJCommandBarSystem.pkg
+
+Object oSkin is a cCJSkinFramework
+    Set psSkinFile of ghoSkinFramework to (Trim(SysTable.SKIN_FILE)) 
+    Set psSkinIni of ghoSkinFramework to (Trim(SysTable.SKIN_INI)) 
+End_Object
+
+Object oToolTipController is a cToolTipController
+    Move Self to ghoToolTipController
+End_Object
+
+Send Popup_Modal of oLogin
+
+Use oEditContextMenu.pkg
+Use oDEOEditContextMenu17.pkg
+Use cWinReport2.pkg
+Use cSTRibbonBar.pkg
+
+Object oMain is a Panel
+    Set Label to ("Dojo Management - " + (Trim(SysTable.DOJO)))
+    Set Location to 4 3
+    Set Size to 300 450
+
+    Object oCommandBarSystem is a cDojoCJCommandBarSystem
+        Set pbTimerUpdate to True
+
+        Procedure OnCreateCommandBars
+            Handle hoOptions
+            Get OptionsObject to hoOptions
+            Forward Send OnCreateCommandBars
+            If (SysTable.RIBBON_MENU) Begin 
+                Send CreateRibbon of oRibbonBar
+            End
+        End_Procedure
+
+        Object oRibbonBar is a cSTRibbonBar
+            
+            Procedure CreateMenus Handle hoRibbonGroups Handle hoRibbonGroup Handle hoControls Variant vControl
+               
+               Send InsertTab "&Start" hoRibbonGroups "Available Views" True
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Views" "Available Views" "Available Views"
+                    Get AddControl hoRibbonGroup ID_MemberListMenuItem "Members List" "Members ... Ctrl+1" "Botones" "Add, edit and delete Customer data." "users.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                    Get AddControl hoRibbonGroup ID_MemberMenuItem "Member Entry" "Inventory Item View ... Ctrl+2" "Botones" "Add, edit and delete Inventory data." "user.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                    Get AddControl hoRibbonGroup ID_TeacherMenuItem "Teachers" "Teachers ... Ctrl+2" "Botones" "Add, edit and delete Teachers data." "user.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Payments" "Payment Views" "Payments Views"
+                    Get AddControl hoRibbonGroup ID_FeesMenuItem "Register Fees" "Register Fees ... Ctrl+1" "Botones" "Add, edit and delete fee data." "Dollar.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                    Get AddControl hoRibbonGroup ID_PaymentMenuItem "Register Payments" "Register Payments ... Ctrl+1" "Botones" "Add, edit and delete payment data." "Dollar.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Reports" "Reports" "Reports"
+                    Get AddControl hoRibbonGroup ID_MembersReportMenuItem "Members List" "Reports" "Botones" "Reports based on the WinPrint class." "Printer.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Dojo/Shibu" "Available Views" "Available Views"
+                    Get AddControl hoRibbonGroup ID_DojoMenuItem "Dojo" "Dojo Entry View ... Ctrl+3" "Botones" "Add, edit and delete Dojo data." "Dojo.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                    Get AddControl hoRibbonGroup ID_ShibuMenuItem "Shibu" "Shibu Entry View ... Ctrl+4" "Botones" "Add, edit and delete Shibu data." "Dojo.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Properties" "Properties" "Properties"
+                    Get AddControl hoRibbonGroup ID_Settings "Settings" "Settings ... Ctrl+3" "Botones" "Settings" "Settings.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Find" "" ""
+                    Send StandardMenu (RefClass(cCJFindFirstMenuItem)) hoRibbonGroup ID_FindFirstMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindPreviousMenuItem)) hoRibbonGroup ID_FindPreviousMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindMenuItem)) hoRibbonGroup ID_FindMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindLastMenuItem)) hoRibbonGroup ID_FindLastMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindNextMenuItem)) hoRibbonGroup ID_FindNextMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJPromptMenuItem)) hoRibbonGroup ID_PromptMenuItem True False False ""
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Data Entry" "" ""
+                   Send StandardMenu (RefClass(cCJClearMenuItem)) hoRibbonGroup ID_ClearMenuItem True False False ""
+                   Send StandardMenu (RefClass(cCJClearAllMenuItem)) hoRibbonGroup ID_ClearAllMenuItem True False False ""
+                   Send StandardMenu (RefClass(cCJSaveMenuItem)) hoRibbonGroup ID_SaveMenuItem True True False ""
+                   Send StandardMenu (RefClass(cCJDeleteMenuItem)) hoRibbonGroup ID_DeleteMenuItem True False False ""
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Text Edit" "" ""
+                    Send StandardMenu (RefClass(cCJCutMenuItem)) hoRibbonGroup ID_CutMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJCopyMenuItem)) hoRibbonGroup ID_CopyMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJPasteMenuItem)) hoRibbonGroup ID_PasteMenuItem True False False ""
+//                Send AddGroup hoRibbonGroups hoRibbonGroup "Remember" "" ""
+//                    Send StandardMenu (RefClass(cCJRememberFieldMenuItem)) hoRibbonGroup ID_ExitMenuItem False False False ""
+//                    Send StandardMenu (RefClass(cCJRememberLastFieldMenuItem)) hoRibbonGroup ID_ExitMenuItem False False False ""
+//                    Send StandardMenu (RefClass(cCJUnRememberFieldMenuItem)) hoRibbonGroup ID_ExitMenuItem False False False ""
+//                    Send StandardMenu (RefClass(cCJUnRememberFieldAllMenuItem)) hoRibbonGroup ID_ExitMenuItem False False False ""
+               Send InsertTab "&Navigate" hoRibbonGroups "Move to different areas of the application" False
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Navigation" "" ""
+                    Send StandardMenu (RefClass(cCJNextAreaMenu)) hoRibbonGroup ID_NextAreaMenu False False False "" 
+                    Send StandardMenu (RefClass(cCJPriorAreaMenu)) hoRibbonGroup ID_PriorAreaMenu False False False "" 
+                    Send StandardMenu (RefClass(cCJNextViewMenu)) hoRibbonGroup ID_NextViewMenu False False False "" 
+                    Send StandardMenu (RefClass(cCJPriorViewMenu)) hoRibbonGroup ID_PriorViewMenu False False False "" 
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Prompts" "" ""
+                    Send StandardMenu (RefClass(cCJPromptMenuItem)) hoRibbonGroup ID_PromptMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJZoomMenuItem)) hoRibbonGroup ID_ZoomMenuItem False False False "Zoom.ico" 
+               Send InsertTab "&Windows" hoRibbonGroups "Display Current Views and set other display options." False
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Display Options" "Display Options" "Set display options."
+                    Send StandardMenu (RefClass(cCJStatusbarMenuItem)) hoRibbonGroup ID_StatusbarMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJAutoArrangeIconsMenuItem)) hoRibbonGroup ID_AutoArrangeIconsMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJRestoreMenusMenuItem)) hoRibbonGroup ID_RestoreMenusMenuItem False False False "" 
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Manage Windows" "Manage Windows" "Manage Windows"
+                    Send StandardMenu (RefClass(cCJCascadeMenuItem)) hoRibbonGroup ID_CascadeMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJTileHorizontally)) hoRibbonGroup ID_TileHorizontally False False False "" 
+                    Send StandardMenu (RefClass(cCJTileVertically)) hoRibbonGroup ID_TileVertically False False False "" 
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Aditional Options" "Aditional Options" "Aditional Options" 
+                    Send StandardMenu (RefClass(cCJMinimizeWindowsMenuItem)) hoRibbonGroup ID_MinimizeWindowsMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJRestoreWindowsMenuItem)) hoRibbonGroup ID_RestoreWindowsMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJAutoArrangeIconsMenuItem)) hoRibbonGroup ID_AutoArrangeIconsMenuItem False False False "" 
+                Send AddGroup hoRibbonGroups hoRibbonGroup "MDI Windows" "MDI Windows" "MDI Windows"
+                    Get AddControl hoRibbonGroup ID_MDIWindows "Active Windows" "Active Windows" "Windows" "Active Windows" "Windows.ico" True xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow True to vControl
+               Send InsertTab "&Help" hoRibbonGroups "Access Information for learning and using this DataFlex application." False
+                Send AddGroup hoRibbonGroups hoRibbonGroup "Help" "Application Help" "Access Information for learning and using this DataFlex application."
+                    Send StandardMenu (RefClass(cCJHelpMenuItem)) hoRibbonGroup ID_HelpMenuItem False False False "" 
+                    Send StandardMenu (RefClass(cCJAboutMenuItem)) hoRibbonGroup ID_AboutMenuItem False False False "" 
+                Get AddSystemButton "world.ico" to hoControls
+                    Send StandardMenu (RefClass(cCJFindFirstMenuItem)) hoControls ID_FindFirstMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindPreviousMenuItem)) hoControls ID_FindPreviousMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindMenuItem)) hoControls ID_FindMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindNextMenuItem)) hoControls ID_FindNextMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJFindLastMenuItem)) hoControls ID_FindLastMenuItem True False False ""
+                    
+                    Send StandardMenu (RefClass(cCJClearMenuItem)) hoControls ID_ClearMenuItem True True False ""
+                    Send StandardMenu (RefClass(cCJClearAllMenuItem)) hoControls ID_ClearAllMenuItem True False False ""
+                    
+                    Send StandardMenu (RefClass(cCJPromptMenuItem)) hoControls ID_PromptMenuItem True True False ""
+                    
+                    Send StandardMenu (RefClass(cCJSaveMenuItem)) hoControls ID_SaveMenuItem True True False ""
+                    Send StandardMenu (RefClass(cCJDeleteMenuItem)) hoControls ID_DeleteMenuItem True False False ""
+                    
+                    Send StandardMenu (RefClass(cCJCutMenuItem)) hoControls ID_CutMenuItem True True False ""
+                    Send StandardMenu (RefClass(cCJCopyMenuItem)) hoControls ID_CopyMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJPasteMenuItem)) hoControls ID_PasteMenuItem True False False ""
+                    Send StandardMenu (RefClass(cCJExitMenuItem)) hoControls ID_ExitMenuItem False True False "Exit.ico"
+           End_Procedure
+
+        End_Object
+
+        If (not(SysTable.RIBBON_MENU)) Begin
+            Object oMenuBar is a cCJMenuBar
+                Object oFileMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup          
+                    Set psCaption to "&Arkiv"
+                    Set psDescription to "S”k, Spara, Radera, Rensa och Avsluta programmet."
+                    Set psCategory to "Menyer"
+    
+                    Object oClearMenuItem is a cCJClearMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oClearAllMenu is a cCJClearAllMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oPromptMenuItem is a cCJPromptMenuItem
+                        Set pbAddToDesignerMenu to True
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oFindMenuItem is a cCJFindMenuItem
+                        Set pbAddToDesignerMenu to True
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oFindNextMenu is a cCJFindNextMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oFindPreviousMenu is a cCJFindPreviousMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oFindFirstMenu is a cCJFindFirstMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oFindLastMenu is a cCJFindLastMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oSaveMenuItem is a cCJSaveMenuItem
+                        Set pbAddToDesignerMenu to True
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oDeleteMenuItem is a cCJDeleteMenuItem
+                        Set pbAddToDesignerMenu to True
+                    End_Object
+    
+                    Object oExitMenu is a cCJExitMenuItem
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                End_Object
+    
+                Object oViewMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup
+                    Set psCaption to "&F”nster"
+                    Set psToolTip to "F”nster"
+                    Set psDescription to "Tillg„ngliga f”nster"
+
+                    Object oMembersListMenuItem is a cCJMenuItem
+                        Set psCaption to "Members List"
+                        Set psTooltip to "Members List"
+                        Set psImage to "users.ico"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oMemberList of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oMemberEntryMenuItem is a cCJMenuItem
+                        Set psCaption to "Member Entry"
+                        Set psTooltip to "Member Entry"
+                        Set psImage to "user.ico"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oMember of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oRegisterFeesMenuItem is a cCJMenuItem
+                        Set psCaption to "Register Fees"
+                        Set psTooltip to "Register Fees"
+                        Set pbControlBeginGroup to True
+                        Set psImage to "dollar.ico"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oRegisterFees of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oDojoMenuItem is a cCJMenuItem
+                        Set psCaption to "Dojo"
+                        Set psTooltip to "Dojo"
+                        Set pbControlBeginGroup to True
+                        Set psImage to "Dojo.ico"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oDojo of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oShibuMenuItem is a cCJMenuItem
+                        Set psCaption to "Shibu"
+                        Set psTooltip to "Shibu"
+                        Set psImage to "Dojo.ico"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oShibu of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oReportMenu is a cCJMenuItem
+                        Set psCaption to "Settings"
+                        Set psToolTip to "Settings"
+                        Set psDescription to "System Settings"
+                        Set pbControlBeginGroup to True
+                        Set psImage to "settings.ico"
+                        Procedure OnExecute Variant vCommandBarControl
+                            Forward Send OnExecute vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oProperties of hoClient
+                        End_Procedure
+                    End_Object
+
+                    Object oTeachersMenuItem is a cCJMenuItem
+                        Set psCaption to "Teachers"
+                        Set psTooltip to "Teachers"
+                    
+                        Procedure OnExecute Variant vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oTeachers of hoClient
+                        End_Procedure
+                    End_Object
+                End_Object
+    
+                Object oReportMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup          
+                    Set psCaption to "&Rapporter"
+                    Set psToolTip to "Rapporter"
+                    Set psDescription to "Tillg„ngliga rapporter"
+
+                    Object oReportMenu is a cCJMenuItem
+                        Set psCaption to "Members List"
+                        Set psToolTip to "Rapporter"
+                        Set psDescription to "Tillg„ngliga rapporter"
+                        Procedure OnExecute Variant vCommandBarControl
+                            Forward Send OnExecute vCommandBarControl
+                            Handle hoClient
+                            Get Client_Id to hoClient
+                            Send Activate_oMemberListReport of hoClient
+                        End_Procedure
+                    End_Object
+                End_Object
+    
+                Object oNavigateMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup      
+                    Set psCaption to "&Navigera"    
+                    Set psTooltip to "Navigera"    
+                    Set psDescription to "Navigera i programmet."
+    
+                    Object oNextAreaMenu is a cCJNextAreaMenu
+                    End_Object
+    
+                    Object oPriorAreaMenu is a cCJPriorAreaMenu
+                    End_Object
+    
+                    Object oNextViewMenu is a cCJNextViewMenu
+                    End_Object
+    
+                    Object oPriorViewMenu is a cCJPriorViewMenu
+                    End_Object
+    
+                    Object oPromptMenu is a cCJPromptMenuItem
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oZoomMenu is a cCJZoomMenuItem
+                    End_Object
+    
+                End_Object
+    
+                Object oWindowMenu is a cCJMDIWindowsMenuItem
+                    Set peControlType to xtpControlPopup      
+                    Set psCaption to "F”nste&r"
+                    Set psToolTip to "F”nster"
+                    Set psDescription to "Visar aktuella f”nster och s„tter ”nskade inst„llningar."    
+    
+                    // These are the static windows items. More will be created in onPopupInit
+                    Object oDisplayOptionsMenu is a cCJMenuItem
+                        Set peControlType to xtpControlPopup              
+                        Set psCaption to "&Visa"
+                        Set psToolTip to "Visa"
+                        Set psDescription to "S„tter ”nskade inst„llningar f”r verktygsf„ltet, statusf„ltet, och ikoner"
+    
+                        Object oStatusbarMenu is a cCJStatusbarMenuItem
+                        End_Object
+    
+                        Object oAutoArrangeIconsMenu is a cCJAutoArrangeIconsMenuItem
+                        End_Object
+    
+                        Object oRestoreMenusMenu is a cCJRestoreMenusMenuItem
+                            Set pbControlBeginGroup to True
+                        End_Object
+    
+                    End_Object
+    
+                    Object oCascadeMenu is a cCJCascadeMenuItem
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oHorizTile is a cCJTileHorizontally
+                    End_Object
+    
+                    Object oVertTile is a cCJTileVertically
+                    End_Object
+    
+                    Object oMinimizeMenuItem is a cCJMinimizeWindowsMenuItem
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                    Object oRestoreMenuItem is a cCJRestoreWindowsMenuItem
+                    End_Object
+    
+                    Object oArrangeIconsMenuItem is a cCJAutoArrangeIconsMenuItem
+                        Set pbControlBeginGroup to True
+                    End_Object
+    
+                End_Object
+    
+                Object oHelpMenu is a cCJMenuItem
+                    Set peControlType to xtpControlPopup    
+                    Set psCaption to "&Hj„lp"
+                    Set psDescription to "Information om hur detta DataFlex program fungerar."
+                    Set psToolTip to "Hj„lp"
+    
+                    Object oHelpMenuItem is a cCJHelpMenuItem 
+                    End_Object
+    
+                    Object oAboutMenuItem is a cCJAboutMenuItem
+                    End_Object
+                End_Object
+            End_Object
+    
+            Object oFindToolBar is a cCJToolbar
+                Set psTitle to "Verktygsf„lt f”r datahantering"
+    
+                Object oFindFirstTool is a cCJFindFirstMenuItem
+                End_Object
+    
+                Object oFindPreviousTool is a cCJFindPreviousMenuItem
+                End_Object
+    
+                Object oFindMenuTool is a cCJFindMenuItem
+                End_Object
+    
+                Object oFindNextTool is a cCJFindNextMenuItem
+                End_Object
+    
+                Object oFindLastTool is a cCJFindLastMenuItem
+                End_Object
+    
+                Object oPromptToolItem is a cCJPromptMenuItem
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+            End_Object
+    
+            Object oFileToolBar is a cCJToolbar
+                Set psTitle to "Verktygsf„lt f”r datainmatning"
+    
+                Object oClearToolItem is a cCJClearMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+    
+                Object oClearAllToolItem2 is a cCJClearAllMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+    
+                Object oSaveToolItem is a cCJSaveMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+                Object oDeleteToolItem is a cCJDeleteMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+    
+            End_Object
+    
+            Object oEditToolBar is a cCJToolbar
+                Set psTitle to "Verktygsf„lt f”r texteditering"
+    
+                Object oCutToolbarItem is a cCJCutMenuItem
+                End_Object
+    
+                Object oCopyToolbarItem is a cCJCopyMenuItem
+                End_Object
+    
+                Object oPasteToolbarItem is a cCJPasteMenuItem
+                End_Object
+    
+                Object oDeleteEditToolbarItem is a cCJDeleteEditMenuItem
+                    Set pbControlBeginGroup to True
+                End_Object
+    
+            End_Object
+    
+            Object oRememberToolbar is a cCJToolbar
+    
+                Object oRememberItems is a cCJMenuItem
+    
+                    Set peControlType to xtpControlPopup
+                    Set peControlStyle to xtpButtonCaption
+                    Set psCaption to C_$Remember
+                    
+                    Object oMenuItem is a cCJRememberFieldMenuItem
+                        Set peControlStyle to xtpButtonIconAndCaption
+                    End_Object
+                    
+                    Object oMenuItem is a cCJRememberLastFieldMenuItem
+                        Set peControlStyle to xtpButtonIconAndCaption
+                    End_Object
+                    
+                    Object oMenuItem is a cCJUnRememberFieldMenuItem
+                        Set peControlStyle to xtpButtonIconAndCaption
+                    End_Object
+                    
+                    Object oMenuItem is a cCJUnRememberFieldAllMenuItem
+                        Set peControlStyle to xtpButtonIconAndCaption
+                    End_Object
+    
+                End_Object
+                
+            End_Object
+        End     
+        
+        Object oStatusBar is a cCJStatusBar
+
+            Object oStatusPane1 is a cCJStatusBarPane
+                Set piID to sbpIDIdlePane
+                Set pbStyleStretch to True
+            End_Object
+
+            Object oStatusPane2 is a cCJStatusBarPane
+                Set phoViewPane to Self
+                Set pbStyleStretch to True
+            End_Object
+
+        End_Object
+
+    End_Object
+
+    Object oClientArea is a ClientArea
+        Use StdAbout.pkg
+        Use Members.vw
+        Use Dojo.vw
+        Use Shibu.vw
+        Use MemberList.vw
+        Use RegisterPayments.vw
+        Use Properties.vw
+        Use MemberList.rv
+        Use Teachers.vw
+
+        Procedure Activate_About
+            Send DoAbout "" "" "" "" ""
+        End_Procedure
+
+    End_Object
+
+End_Object
+
+Start_UI

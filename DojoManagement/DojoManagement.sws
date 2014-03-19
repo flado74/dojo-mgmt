@@ -1,0 +1,11 @@
+[Properties]
+Version=17.1
+[WorkspacePaths]
+ConfigFile=.\Programs\Config.ws
+[TestProjects]
+TestWindowsProject=test.src
+[Projects]
+Project0=DojoManagement.src
+Project1=test.src
+[Libraries]
+Lib1=..\PP7Dev\Libraries\CodeJock\SigCodejock Classes v1\SigCj Classes v1 - vdf17.1 cj15.3.1.sws

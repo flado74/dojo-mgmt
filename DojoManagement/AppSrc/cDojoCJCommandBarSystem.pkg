@@ -1,0 +1,348 @@
+Use cCJCommandBarSystem.pkg
+Use Dftimer.pkg
+Define C_GreenAlert for 1
+Define C_RedAlert for 2
+
+Class cDojoCJCommandBarSystem is a cCJCommandBarSystem
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        
+        Property Boolean pbThemedBackColor True
+        Property Handle phoMessageBar
+        Property Handle phoCommandBar
+        Property Boolean pbMaximizeAll False
+        Property Boolean pbSetCommandBars True
+
+        Set pbTimerUpdate               to True
+        Set pbEnableCustomization       to True                 // Will enable user to change menus and toolbars.
+        Set pbAltDragCustomization      to True                 // Will enable user to change where menus and toolbars are displayed.
+        Set pbCustomizeShowKeyboardPage to True
+        Set pbCustomizeShowOptionsPage  to False                // Don't need Options, already on the Program's Preferences panel.
+        Set peRestoreLayout             to rlSaveRestoreLayout      // Spara ny layout som anv„ndaren gjort
+        Set pbShowExpandButtonAlways    to True                 // Show the 'chevron' button at end of the toolbars. User clicks it to make changes.
+        Set pbIconsWithShadow           to True                 // Displays a shadow 'under' an icon when mouse hoovers over it.
+        Set pbOfficeStyleDisabledIcons  to True                 // Not sure what this does...
+        Set pbAlwaysShowFullMenus       to False                // visa inte alltid hela menyerna (beroende p† nedanst†ende)
+        Set pbAutoHideUnusedPopups      to False                // oanv„nda menysaker visas ej direkt
+        
+    End_Procedure
+
+    Procedure End_Construct_Object
+        Forward Send End_Construct_Object
+        
+    End_Procedure
+
+    // DoShowMessageBar
+    {MethodType=Method}
+    Procedure DoShowMessageBar String sMessage String sMessageTitle Boolean bError Boolean bAlert
+      Send pCreateMessageBar of ghoMessageBar //(phoMessageBar(Self))
+      If (ghoMessageBar) Begin //(phoMessageBar(Self)) Begin
+         Send DoShowMessageBar of ghoMessageBar sMessage sMessageTitle bError bAlert //(phoMessageBar(Self)) sMessage sMessageTitle 
+         Set pbVisible      of ghoMessageBar to True //(phoMessageBar(Self)) to True
+      End
+    End_Procedure
+    
+    // DoHideMessageBar
+    Procedure DoHideMessageBar
+      If (phoMessageBar(Self)) Begin
+         Set pbVisible of ghoMessageBar to False//(phoMessageBar(Self)) to False
+      End
+    End_Procedure
+   
+    Procedure OnCreateCommandBars                           // Event automatically processed at startup.
+        Handle hoOptions hoFont
+        Variant vFont
+        //SINCE WE CHANGE THE SKINS AND TOOLBARS IN SYSTEMUNDERHLL
+        //WE HAVE TO TELL THE COMMANDBARS TO RELOAD, OTHERWISE IT WILL KEEP IT'S 
+        //PREVIOUS SETTINGS!
+        Set peVisualTheme               to xtpThemeOffice2007  
+        Set peAnimation                 to xtpAnimateWindowsDefault     // Sets attribute for popup menus only.                
+        Integer iSize iLayoutBuild
+        If (peRestoreLayout(Self) = rlNoSaveRestore) Begin //did this since pilayoutbuild messed up commandbars in some situations
+            Get piLayoutBuild to iLayoutBuild
+            Increment iLayoutBuild
+            Set piLayoutBuild to iLayoutBuild
+        End
+        Set pbShowTextBelowIcons    to False // text under ikoner i toolbaren                
+        Get OptionsObject           to hoOptions
+        Set ComIconsWithShadow      of hoOptions to True
+        Set ComLargeIcons           of hoOptions to False
+        Move 16   to iSize
+        Send ComSetPopupIconSize    of hoOptions iSize iSize        // Set icon size for Menu popup items.
+        Move 16 to iSize
+        Send ComSetIconSize         of hoOptions False iSize iSize  // Set icon size for Toolbar buttons.
+        //set fontsize
+        Get ComFont of hoOptions to vFont
+//        Send pChange_Fonts_Mixin_CJ vFont
+        //add the tab workspace
+        If (SysTable.SHOW_TABS) Send DisplayTabWorkspace
+
+        String sDLL
+        Handle hoPaintManager hoClientIdParent hoClientId hoCommandBarGlobalSetting
+        Boolean bIsComObjectCreated
+        Get psProgramPath of (phoWorkspace(ghoApplication)) to sDLL
+        //fix to make sure commandbars still use the old way since they are CJ v13.4 or something similar
+        //and we use CJ v15.1.3
+//        Move (sDLL + "\" + (Left(Regd0002.PEO2007IMAGE, (Pos("-", Regd0002.PEO2007IMAGE) - 1)))) to sDLL
+        Move "Office2010.dll" to sDLL
+        Get Create (RefClass(cCJCommandBarsGlobalSettings)) to hoCommandBarGlobalSetting
+        Get IsComObjectCreated of hoCommandBarGlobalSetting to bIsComObjectCreated
+        If (not(bIsComObjectCreated)) Send CreateComObject of hoCommandBarGlobalSetting
+//        Set ComOffice2007Images of hoCommandBarGlobalSetting to sDLL
+        
+        Variant vPaintManager
+        Get ComPaintManager of Self to vPaintManager
+        Get Create (RefClass(cCJPaintManager)) to hoPaintManager
+        Set pvComObject of hoPaintManager to vPaintManager
+        Get IsComObjectCreated of hoPaintManager to bIsComObjectCreated
+        If (not(bIsComObjectCreated)) Send CreateComObject of hoPaintManager
+        Send ComRefreshMetrics of hoPaintManager
+        Send Destroy of hoPaintManager
+        Send ComRecalcLayout
+        Get Client_Id to hoClientId
+        Get Parent of hoClientId to hoClientIdParent 
+        Send OnPaint of hoClientIdParent
+        If (pbSetCommandBars(Self)) Begin
+            Set phoCommandBar to Self
+            Move Self to ghoCommandBars
+
+            Variant vIcons
+            Handle hoIcons
+            String sBitmapPath
+            Get ComIcons of hoCommandBarGlobalSetting to vIcons
+            Get Create (RefClass(cCJImageManagerIcons)) to hoIcons
+            Set pvComObject of hoIcons to vIcons
+            Get psBitmapPath of (phoWorkspace(ghoApplication)) to sBitmapPath
+    
+//            Send ComLoadIcon of hoIcons (sBitmapPath-"\903550-button-ok.ico") C_GreenAlert OLExtpImageNormal //FAVORITES
+//            Send ComLoadIcon of hoIcons (sBitmapPath-"\close.ico") C_RedAlert OLExtpImageNormal //FAVORITES
+            Set ComIcons of hoCommandBarGlobalSetting    to vIcons
+        End
+        Forward Send OnCreateCommandBars
+    End_Procedure
+
+    Procedure DisplayTabWorkspace
+        Variant vTab vTest vFont
+        Handle hoTab hoTest hoFont
+        Boolean bShow
+        Integer iSize
+        If (IsComObjectCreated(Self)) Begin
+            Move True to bShow
+            If ((bShow)) Begin
+                Get Create U_cCJTabWorkspace to hoTab
+                Get ComShowTabWorkspace bShow to vTab
+                Set pvComObject of hoTab to vTab
+                If (not(IsComObjectCreated(hoTab))) Begin
+                    Procedure_Return
+                End
+                Set ComFlags of hoTab to xtpWorkspaceShowCloseTab //xtpWorkspaceShowCloseSelectedTab
+                Set ComThemedBackColor of hoTab to (pbThemedBackColor(Self)) //True //f”r att visa bakgrundsbild i client area - s„tt false
+                Get Create U_cCJTabPaintmanager to hoTest
+                Get ComPaintManager of hoTab to vTest
+                Set pvComObject of hoTest to vTest
+                If (not(IsComObjectCreated(hoTest))) Begin
+                    Procedure_Return
+                End
+                //om vi valt office 2007 som tema s† s„tter vi visual studio 2005 f”r det „r snyggare
+                //If ((Regd0002.peVisualTheme = 5) or (Regd0002.peVisualTheme > 6)) Set ComAppearance of hoTest to xtpTabAppearanceVisualStudio2005 
+                Set ComAppearance of hoTest to xtpTabAppearancePropertyPage2003
+                //s„tt f„rgen till office2007 f”r det ger den gula high lighten
+                //Set ComColor of hoTest to xtpTabColorOffice2007
+                //st„ng av onenote colors, som g”r random-f„rger p† tabbarna
+                Set ComOneNoteColors of hoTest to False
+                //set fontsize
+                Get ComFont of hoTest to vFont
+//                Send pChange_Fonts_Mixin_CJ vFont
+                
+                //this makes EVERY view maximize!!!!
+                If (SysTable.MAXIMIZE_VIEWS) Send ComEnableGroups of hoTab 
+
+                Send Destroy of hoTab
+                Send Destroy of hoTest
+                Send ComRecalcLayout
+            End
+        End
+    End_Procedure 
+
+End_Class
+
+//************* MESSAGEBAR CLASS **************
+Class cDojoMessageBar is a cCJMessageBar
+    // Construct_Object
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        
+        {Category="Appearance"}
+        Property String psCloseButtonTooltip "St„ng"
+        
+        {PropertyType=Color}
+        { EnumList="clAqua, clBlack, clBlue, clDkGray, clFuchsia, clGray, clGreen, clLime, clLtGray" }
+        { EnumList+="clMaroon, clNavy, clOlive, clPurple, clRed, clSilver, clTeal, clWhite, clYellow" }
+        {Category="Appearance"}
+        Property Integer piTextColor clGreen
+        
+        {Visibility=Private}
+        Property Boolean pbPrivateVisible False
+        {Visibility=Private}
+        Property Boolean pbPrivateCloseButton True
+        {Visibility=Private}
+        Property Handle phoParent
+        
+        Object oTimer is a DFTimer
+            
+        End_Object
+        
+        Delegate Set phoMessageBar to (Self)
+        Move Self to ghoMessageBar
+    End_Procedure
+   
+   // Convert illegal characters to XAML entities
+   {Visibility=Private}
+   Function EncodePlaintext String sMessage Returns String
+      Move (Replaces("&",sMessage,"&amp;"))     to sMessage
+      Move (Replaces("<",sMessage,"&lt;"))      to sMessage
+      Move (Replaces(">",sMessage,"&gt;"))      to sMessage
+      Move (Replaces("'",sMessage,"&apos;"))    to sMessage
+      Move (Replaces('"',sMessage,"&quot;"))    to sMessage
+      Move (Replaces("\n",sMessage,"&#x0a;"))    to sMessage
+      Function_Return sMessage
+   End_Function // EncodePlaintext
+   
+   // Convert decimal to Hex
+   {Visibility=Private}
+   Function DecToHex Integer iDec Returns String
+      String sHex sHexchars
+      Move "0123456789ABCDEF" to sHexchars
+      Move "" to sHex
+      Repeat
+         Insert (Mid(sHexchars,1,((iDec iand $0f) + 1))) In sHex At 1
+         Move (iDec / $10) to iDec
+      Until (iDec = 0)
+      Function_Return sHex
+   End_Function
+   
+   // RgbToHex
+   // Convert the RGB color to a hex color
+   {Visibility=Private}
+   Function RgbToHex Integer iColor Returns String
+      String sRed sGreen sBlue
+
+      Get DecToHex (R_From_RGB(iColor)) to sRed
+      Get DecToHex (G_From_RGB(iColor)) to sGreen
+      Get DecToHex (B_From_RGB(iColor)) to sBlue
+      
+      Move (Right(("00" + sRed),2))   to sRed
+      Move (Right(("00" + sGreen),2)) to sGreen
+      Move (Right(("00" + sBlue),2))  to sBlue
+      
+      Function_Return ("#" + sRed + sGreen + sBlue)
+   End_Function
+   
+    {Visibility=Private}
+    Procedure DoShowMessageBar String sMessage String sMessageTitle Boolean bError Boolean bAlert
+        String sXml sHexColor 
+        Handle hoParent
+        
+        Get Parent to hoParent
+
+        If (IsComObjectCreated(Self)) Begin
+         
+//            Get RgbToHex (piTextColor(Self)) to sHexColor
+    
+            If (bError) Begin
+                Get RgbToHex clRed to sHexColor
+                Move ("<StackPanel Orientation='Horizontal' >" + ;
+                    "<Image Height='8' Width='8' Source='"+(CString(C_RedAlert))+"'/>" + ;
+                    " <TextBlock Padding='10, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'><Bold>" + EncodePlaintext(Self,sMessageTitle) + "</Bold></TextBlock>" + ;
+                    " <TextBlock Padding='20, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'>" + EncodePlaintext(Self,sMessage) + "</TextBlock>" + ;
+                    "</StackPanel>") to sMessage
+            End
+            Else If (bAlert) Begin
+                Get RgbToHex clYellow to sHexColor
+                Move ("<StackPanel Orientation='Horizontal' >" + ;
+                    "<Image Height='16' Width='16' Source='"+(CString(C_GreenAlert))+"'/>" + ;
+                    " <TextBlock Padding='10, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'><Bold>" + EncodePlaintext(Self,sMessageTitle) + "</Bold></TextBlock>" + ;
+                    " <TextBlock Padding='20, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'>" + EncodePlaintext(Self,sMessage) + "</TextBlock>" + ;
+                    "</StackPanel>") to sMessage
+            End
+            Else Begin 
+                Get RgbToHex clGreen to sHexColor
+                Move ("<StackPanel Orientation='Horizontal' >" + ;
+                "<Image Height='16' Width='16' Source='"+(CString(C_GreenAlert))+"'/>" + ;
+                " <TextBlock Padding='10, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'><Bold>" + EncodePlaintext(Self,sMessageTitle) + "</Bold></TextBlock>" + ;
+                " <TextBlock Padding='20, 0, 0, 0' VerticalAlignment='Center' Foreground='" + sHexColor + "'>" + EncodePlaintext(Self,sMessage) + "</TextBlock>" + ;
+                "</StackPanel>") to sMessage
+                
+            End
+            Set ComMessage to sMessage
+        End
+    End_Procedure
+   
+   {MethodType=Property Category="Behaviour"}
+   {PropertyType=Boolean InitialValue=False}
+   Procedure Set pbVisible Boolean bStatus
+      Set pbPrivateVisible to bStatus
+      If (IsComObjectCreated(Self)) Begin
+         Set ComVisible to bStatus
+      End
+   End_Procedure
+   
+   {MethodType=Property Category="Behaviour"}
+   Function pbVisible Returns Boolean
+       Function_Return (pbPrivateVisible(Self))
+   End_Function
+   
+   {MethodType=Property Category="Appearance"}
+   {PropertyType=Boolean InitialValue=True}
+   Procedure Set pbCloseButton Boolean bStatus
+      Set pbPrivateCloseButton to bStatus
+      If (IsComObjectCreated(Self)) Begin
+         If (bStatus) Send ComAddCloseButton (psCloseButtonTooltip(Self)) 
+      End
+   End_Procedure
+   
+   {MethodType=Property Category="Appearance"}
+   Function pbCloseButton Returns Boolean
+       Function_Return (pbPrivateCloseButton(Self))
+   End_Function
+
+   // DoRemoveButtons
+   {MethodType=Method}
+   Procedure DoRemoveButtons
+      Send ComRemoveButtons
+   End_Procedure
+   
+   {Visibility=Private}
+   Procedure PrivateCreate Handle hoParent        
+      Handle hoCommandBar hoControls
+        
+      Set pvComObject to (ComMessageBar(phoCommandBar(hoParent)))
+      Broadcast Send CreateComInstance (Self)
+      
+      //Apply Settings
+      Set pbVisible     to (pbPrivateVisible(Self))
+      Set pbCloseButton to (pbPrivateCloseButton(Self))
+      
+   End_Procedure
+   
+    Procedure pCreateMessageBar
+        Forward Send OnCreate
+        
+        Handle hoCommandBar hoControls hoParent
+        
+        Get Parent to hoParent
+        
+        Variant vMessageBar
+        Get ComMessageBar of hoParent to vMessageBar
+        
+        Set pvComObject to vMessageBar
+        Broadcast Send CreateComInstance (Self)
+        
+        //Apply Settings
+        Set pbVisible     to (pbPrivateVisible(Self))
+        Set pbCloseButton to (pbPrivateCloseButton(Self))
+                
+    End_Procedure
+   
+End_Class

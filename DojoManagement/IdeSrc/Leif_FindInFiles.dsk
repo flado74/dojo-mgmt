@@ -1,0 +1,13 @@
+[Header]
+Mask=*.src;*.vw;*.sl;*.dg;*.rv;*.bp;*.pkg;*.wo;*.dd;*.inc;*.tpl;*.dfo;*.asp;*.asa;*.htm;*.html;*.css;*.js
+Active=0
+SubDirectories=1
+WholeWordOnly=0
+SearchWhere=0
+Location=D:\DojoManagement\IdeSrc\Leif_FindInFiles.dsk
+[D:\DojoManagement\AppSrc]
+IsEnabled=1
+[D:\DojoManagement\DdSrc]
+IsEnabled=1
+[D:\DojoManagement\AppHtml]
+IsEnabled=1

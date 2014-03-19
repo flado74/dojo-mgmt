@@ -1,0 +1,82 @@
+Use DataDict.pkg
+
+Open Payments
+Open Members
+Open PaymentsHeader
+
+Object oPaymentTypes is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "Membership Renewal"
+        Send Add_Table_Value "1" "Rank Fee"
+        Send Add_Table_Value "2" "Seminar Fee"
+        Send Add_Table_Value "3" "Other"
+    End_Procedure
+End_Object
+
+Register_Function ValidatePaymentsDOJOCHO_PART Integer iColumn Number nValue Returns Boolean
+
+Class cPaymentsDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to Payments.File_Number
+
+        Set Add_Server_File to PaymentsHeader.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field Payments.ID to File_Field PaymentsHeader.PAYMENTS_IDS
+        Set Field_Option Field Payments.ID DD_DISPLAYONLY to True
+
+        Set Field_Mask_Type Field Payments.PAYMENT_DATE to Mask_Date_Window
+        Set Field_Label_Long Field Payments.PAYMENT_DATE to "Payment Date"
+        Set Field_Label_Short Field Payments.PAYMENT_DATE to "Payment Date"
+        Set Field_Option Field Payments.PAYMENT_DATE DD_COMMIT to True
+
+        Set Field_Option Field Payments.JAPAN_PART DD_NOENTER to True
+
+        Set Field_Value_Table Field Payments.TYPE to oPaymentTypes
+        Set Field_Class_Name Field Payments.TYPE to "dbComboForm"
+        Set Field_Exit_msg Field Payments.TYPE to ExitPaymentsTYPE
+
+        Set Field_Checkbox_Values Field Payments.PAID to "1" "0"
+        Set Field_Class_Name Field Payments.PAID to "dbCheckBox"
+
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        Move (PaymentsHeader.TOTAL + Payments.TOTAL_PAYMENT) to PaymentsHeader.TOTAL
+    End_Procedure
+    
+    Procedure Backout
+        Move (PaymentsHeader.TOTAL - Payments.TOTAL_PAYMENT) to PaymentsHeader.TOTAL
+    End_Procedure
+
+    Function ValidatePaymentsTYPE Integer iColumn Integer iValue Returns Boolean
+    End_Function
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Default_Value Field Payments.PAID to 1
+        Set Field_Default_Value Field Payments.PAYMENT_DATE to PaymentsHeader.PAYMENT_DATE
+    End_Procedure
+
+    Procedure ExitPaymentsTYPE Integer iColumn Integer iValue
+        If (iValue = 0) Begin 
+            If (Members.MEMBERSHIP = 0) Set Field_Changed_Value Field Payments.JAPAN_PART to 5000
+             Else Set Field_Changed_Value Field Payments.JAPAN_PART to 15000
+        End
+        Else If (iValue = 1) Begin
+            If (Members.MEMBERSHIP = 0) Set Field_Changed_Value Field Payments.JAPAN_PART to 1000
+            Else Begin 
+                Set Field_Changed_Value Field Payments.JAPAN_PART to 15000
+            End
+        End
+    End_Procedure
+
+End_Class

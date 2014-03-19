@@ -1,0 +1,38 @@
+-----------------------------------------------------------------------------
+  DATE: 2012-06-05      TIME: 23:33                                  PAGE:  1
+  FILE DEFINITION FOR FILE: Shibu (# 3)
+-----------------------------------------------------------------------------
+  DRIVER NAME               : DATAFLEX
+  FILE ROOT NAME            : Shibu
+  USER DISPLAY NAME         : Shibu
+  DATAFLEX FILE NAME        : Shibu
+-----------------------------------------------------------------------------
+  RECORD LENGTH             : 102       ( USED: 54 )
+  MAX NUMBER OF RECORDS     : 10000     ( USED: 7 )
+  FILE COMPRESSION          : NONE
+  RE-USE DELETED SPACE      : YES
+  LOCKING TYPE              : FILE
+  HEADER INTEGRITY CHECKING : YES
+  TRANSACTION TYPE          : CLIENT ATOMIC
+  RECORD IDENTITY INDEX     : 0 ( 0 , 0 )
+  FILE LOGIN PARAMETER      : 
+  SYSTEM FILE               : NO 
+-----------------------------------------------------------------------------
+
+NUM  FIELD NAME       TYPE SIZE  OFFST IX   RELATES TO FILE.FIELD
+---  ---------------  ---- ----- ----- --   ---------------------------------
+  1  ID               NUM    2.0     1  1   
+  2  NAME             ASC     50     2  2   
+  3  DOJO_ID          NUM    2.0    52  3   Dojos.FIELD_1 (2,1)
+  4  SHIBU_CHO        NUM    4.0    53      Teachers.ID (9,1)
+
+
+INDEX# FIELDS          DES U/C    LENGTH LEVELS SEGMENTS MODE
+------ --------------- --- ---    ------ ------ -------- -------
+  1    ID              NO  NO       1      2       1     ON-LINE
+
+  2    NAME            NO  NO       50     5       1     ON-LINE
+
+  3    DOJO_ID         NO  NO       2      2       2     ON-LINE
+       ID              NO  NO 
+

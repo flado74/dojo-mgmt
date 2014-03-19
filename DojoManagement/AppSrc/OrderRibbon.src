@@ -1,0 +1,363 @@
+Use OrderPrecompile.pkg
+
+Use DfAllent.pkg
+Use cCJStandardCommandBarSystem.pkg
+Use cToolTipController.pkg
+
+Object oHtmlHelp is a cHtmlHelp
+End_Object
+
+Object oApplication is a cApplication
+    Set psCompany to "Data Access Worldwide"
+    Set psProduct to "Visual DataFlex Examples"
+    Set psVersion to "17.0"
+    Set psProgram to "Order"
+    Set psHelpFile to "Examples.chm"
+    Set peHelpType to htHtmlHelp
+End_Object
+
+Object oToolTipController is a cToolTipController
+    Move Self to ghoToolTipController
+End_Object
+
+Use oEditContextMenu.pkg
+Use oDEOEditContextMenu17.pkg
+Use cWinReport2.pkg
+Use cSTRibbonBar.pkg
+
+Object oMain is a Panel
+    Set Label to "Order Entry Sample Application"
+    Set Location to 4 3
+    Set Size to 300 450
+
+    Object oCommandBarSystem is a cCJCommandBarSystem
+    
+        Set pbTimerUpdate to True
+    
+        Procedure OnCreateCommandBars
+            Handle hoOptions
+            Get OptionsObject to hoOptions
+            Forward Send OnCreateCommandBars
+            
+            Send CreateRibbon of oRibbonBar
+        
+        End_Procedure
+    
+        Object oRibbonBar is a cSTRibbonBar
+            
+            Procedure CreateMenus Handle hoRibbonGroups Handle hoRibbonGroup Handle hoControls Variant vControl
+               
+               Send InsertTab "&File" hoRibbonGroups "File Menu"
+       
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Clear" "" ""
+
+               Send StandardMenu (RefClass(cCJClearMenuItem)) hoRibbonGroup ID_ClearMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJClearAllMenuItem)) hoRibbonGroup ID_ClearAllMenuItem True False False ""
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Prompt" "" ""
+
+               Send StandardMenu (RefClass(cCJPromptMenuItem)) hoRibbonGroup ID_PromptMenuItem True False False ""
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Find" "" ""
+
+               Send StandardMenu (RefClass(cCJFindMenuItem)) hoRibbonGroup ID_FindMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJFindNextMenuItem)) hoRibbonGroup ID_FindNextMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJFindPreviousMenuItem)) hoRibbonGroup ID_FindPreviousMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJFindFirstMenuItem)) hoRibbonGroup ID_FindFirstMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJFindLastMenuItem)) hoRibbonGroup ID_FindLastMenuItem True False False ""
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "SaveDel" "" ""
+
+               Send StandardMenu (RefClass(cCJSaveMenuItem)) hoRibbonGroup ID_SaveMenuItem True False False ""
+
+               Send StandardMenu (RefClass(cCJDeleteMenuItem)) hoRibbonGroup ID_DeleteMenuItem True False False ""
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Exit" "" ""
+               
+               Send StandardMenu (RefClass(cCJExitMenuItem)) hoRibbonGroup ID_ExitMenuItem False False True "Exit.ico"
+
+               Send InsertTab "&View" hoRibbonGroups "Available Views"
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Views" "Available Views" "Available Views"
+
+               Get AddControl hoRibbonGroup ID_CustomerEntryViewMenuItem "Customer Entry View" "Customer Entry View ... Ctrl+1" "Botones" "Add, edit and delete Customer data." "Customers.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Get AddControl hoRibbonGroup ID_InventoryItemViewMenuItem "Inventory Item View" "Inventory Item View ... Ctrl+2" "Botones" "Add, edit and delete Inventory data." "Inventory.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Get AddControl hoRibbonGroup ID_OrderEntryMenuItem "Order Entry" "Order Entry ... Ctrl+3" "Botones" "Add, edit and delete Order data." "orders.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Get AddControl hoRibbonGroup ID_SalesPersonEntryViewMenuItem "Sales Person Entry View" "Sales Person Entry View ... Ctrl+4" "Botones" "Add, edit and delete Sales Person data." "SalesPerson.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Get AddControl hoRibbonGroup ID_VendorEntryViewMenuItem "Vendor Entry View" "Vendor Entry View ... Ctrl+5" "Botones" "Add, edit and delete Vendor data." "Vendors.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Send InsertTab "&Report" hoRibbonGroups "Available Reports"
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Reports" "Available Reports" "Available Reports"
+
+               Get AddControl hoRibbonGroup ID_BasicReportsMenuItem "Basic Reports" "Basic Reports" "Botones" "Reports based on the Basic Report class." "Printer.ico" False xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow False to vControl
+
+               Get CreateSubControls vControl to hoControls
+
+               Get AddControl hoControls ID_CustomerListMenuItem "Customer List" "Customer List (Basic)" "Vistas" "Customer List (Basic)" "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+            
+               Send AddGroup hoRibbonGroups hoRibbonGroup "WinPrint" "WinPrint Reports" "WinPrint Reports"
+
+               Get AddControl hoRibbonGroup ID_WinPrintReportsMenuItem "WinPrint Reports" "WinPrint Reports" "Botones" "Reports based on the WinPrint class." "Printer.ico" False xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow False to vControl
+
+               Get CreateSubControls vControl to hoControls
+
+               Get AddControl hoControls ID_CustomerListMenuItem2 "Customer List" "Customer List (WinPrint) ... Ctrl+6" "Vistas" "Print Customer data" "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+            
+               Get AddControl hoControls ID_ItemsperOrderMenuItem "Items per Order" "Items per Order (WinPrint) ... Ctrl+7" "Vistas" "Print line items for all Orders." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+            
+               Get AddControl hoControls ID_OrdersbyCustomerMenuItem1 "Orders by Customer" "Orders by Customer (WinPrint) ... Ctrl+8" "Vistas" "Print Order data sorted by Customer." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+            
+               Get AddControl hoControls ID_OrdersbyOrderNumberMenuItem "Orders by Order Number" "Orders by Order Number (WinPrint) ... Ctrl+9" "Vistas" "Print Order data." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+            
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Crystal Reports" "Crystal Reports" "Crystal Reports"
+
+               Get AddControl hoRibbonGroup ID_CrystalReportsMenuItem "Crystal Reports" "Crystal Reports" "Botones" "Reports based on the Crystal class." "Printer.ico" False xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow False to vControl
+
+               Get CreateSubControls vControl to hoControls
+
+               Get AddControl hoControls ID_AddressLabelsMenuItem "Address Labels" "Address Labels (Crystal)" "Vistas" "Print address labels for Customers or Vendors." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+    
+               Get AddControl hoControls ID_CustomerListMenuItem1 "Customer List" "Customer List (Crystal)" "Vistas" "Print or export Customer data." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+    
+               Get AddControl hoControls ID_OrdersbyCustomerMenuItem "Orders by Customer" "Orders by Customer (Crystal)" "Vistas" "Print Order data sorted by Customer." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+    
+               Get AddControl hoControls ID_OrdersMenuItem "Orders" "Orders (Crystal)" "Vistas" "Print Order data." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+    
+               Get AddControl hoControls ID_ReportInformationMenuItem "Report Information" "Report Information (Crystal)" "Vistas" "Select any Crystal Report and examine its structure.." "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+    
+               Get AddControl hoRibbonGroup ID_CrystalReportsPreviewerMenuItem "Crystal Reports Previewer" "Crystal Reports Previewer" "Botones" "Select any Crystal Report to run in Preview." "Printer.ico" True xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+
+               Send InsertTab "&Navigate" hoRibbonGroups "Move to different areas of the application"
+               
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Navigation" "" ""
+
+               Send StandardMenu (RefClass(cCJNextAreaMenu)) hoRibbonGroup ID_NextAreaMenu False False False "" 
+
+               Send StandardMenu (RefClass(cCJPriorAreaMenu)) hoRibbonGroup ID_PriorAreaMenu False False False "" 
+
+               Send StandardMenu (RefClass(cCJNextViewMenu)) hoRibbonGroup ID_NextViewMenu False False False "" 
+
+               Send StandardMenu (RefClass(cCJPriorViewMenu)) hoRibbonGroup ID_PriorViewMenu False False False "" 
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Prompts" "" ""
+
+               Send StandardMenu (RefClass(cCJPromptMenuItem)) hoRibbonGroup ID_PromptMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJZoomMenuItem)) hoRibbonGroup ID_ZoomMenuItem False False False "Zoom.ico" 
+
+               Send InsertTab "&Windows" hoRibbonGroups "Display Current Views and set other display options."
+               
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Display Options" "Display Options" "Set display options."
+
+               Send StandardMenu (RefClass(cCJStatusbarMenuItem)) hoRibbonGroup ID_StatusbarMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJAutoArrangeIconsMenuItem)) hoRibbonGroup ID_AutoArrangeIconsMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJRestoreMenusMenuItem)) hoRibbonGroup ID_RestoreMenusMenuItem False False False "" 
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Manage Windows" "Manage Windows" "Manage Windows"
+
+               Send StandardMenu (RefClass(cCJCascadeMenuItem)) hoRibbonGroup ID_CascadeMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJTileHorizontally)) hoRibbonGroup ID_TileHorizontally False False False "" 
+
+               Send StandardMenu (RefClass(cCJTileVertically)) hoRibbonGroup ID_TileVertically False False False "" 
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Aditional Options" "Aditional Options" "Aditional Options" 
+
+               Send StandardMenu (RefClass(cCJMinimizeWindowsMenuItem)) hoRibbonGroup ID_MinimizeWindowsMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJRestoreWindowsMenuItem)) hoRibbonGroup ID_RestoreWindowsMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJAutoArrangeIconsMenuItem)) hoRibbonGroup ID_AutoArrangeIconsMenuItem False False False "" 
+
+               Send AddGroup hoRibbonGroups hoRibbonGroup "MDI Windows" "MDI Windows" "MDI Windows"
+
+               Get AddControl hoRibbonGroup ID_MDIWindows "Active Windows" "Active Windows" "Windows" "Active Windows" "Windows.ico" True xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow True to vControl
+
+               Send InsertTab "&Help" hoRibbonGroups "Access Information for learning and using this DataFlex application."
+               
+               Send AddGroup hoRibbonGroups hoRibbonGroup "Help" "Application Help" "Access Information for learning and using this DataFlex application."
+
+               Send StandardMenu (RefClass(cCJHelpMenuItem)) hoRibbonGroup ID_HelpMenuItem False False False "" 
+
+               Send StandardMenu (RefClass(cCJAboutMenuItem)) hoRibbonGroup ID_AboutMenuItem False False False "" 
+               
+               Get AddSystemButton "world.ico" to hoControls
+
+               Get AddControl hoControls ID_CrystalReportsPreviewerMenuItem "Crystal Reports Previewer" "Crystal Reports Previewer" "Botones" "Select any Crystal Report to run in Preview." "Printer.ico" False xtpControlButton xtpButtonIconAndCaption False to vControl
+
+               Get AddControl hoControls ID_PrinterSetup "Printer Setup" "Printer Setup" "Botones" "Printer Setup Dialog." "Printer.ico" False xtpControlButton xtpButtonIconAndCaption False to vControl
+
+               Send StandardMenu (RefClass(cCJExitMenuItem)) hoControls ID_ExitMenuItem False True False "Exit.ico"
+
+           End_Procedure
+
+        End_Object
+    
+        Object oFindToolBar is a cCJToolbar
+            Set psTitle to "Finding Toolbar"
+            Set peBarPosition to xtpBarBottom
+    
+            Object oFindFirstTool is a cCJFindFirstMenuItem
+            End_Object
+    
+            Object oFindPreviousTool is a cCJFindPreviousMenuItem
+            End_Object
+    
+            Object oFindMenuTool is a cCJFindMenuItem
+            End_Object
+    
+            Object oFindNextTool is a cCJFindNextMenuItem
+            End_Object
+    
+            Object oFindLastTool is a cCJFindLastMenuItem
+            End_Object
+    
+            Object oPromptToolItem is a cCJPromptMenuItem
+                Set pbControlBeginGroup to True
+            End_Object
+    
+        End_Object
+            
+        Object oFileToolBar is a cCJToolbar
+            Set psTitle to "Data Entry Toolbar"
+            Set peBarPosition to xtpBarBottom
+    
+            Object oClearToolItem is a cCJClearMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+            
+            Object oClearAllToolItem2 is a cCJClearAllMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+                
+            Object oSaveToolItem is a cCJSaveMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+                Set pbControlBeginGroup to True
+            End_Object
+    
+            Object oDeleteToolItem is a cCJDeleteMenuItem
+                Set peControlStyle to xtpButtonIconAndCaption
+            End_Object
+    
+        End_Object
+    
+        Object oEditToolBar is a cCJToolbar
+            Set psTitle to "Edit Toolbar"
+            Set peBarPosition to xtpBarBottom
+            
+            Object oCutToolbarItem is a cCJCutMenuItem
+            End_Object
+    
+            Object oCopyToolbarItem is a cCJCopyMenuItem
+            End_Object
+    
+            Object oPasteToolbarItem is a cCJPasteMenuItem
+            End_Object
+    
+            Object oDeleteEditToolbarItem is a cCJDeleteEditMenuItem
+                Set pbControlBeginGroup to True
+            End_Object
+    
+        End_Object
+                
+        Object oRememberToolbar is a cCJToolbar
+            Set peBarPosition to xtpBarBottom
+
+            Object oRememberItems is a cCJMenuItem
+
+                Set peControlType to xtpControlPopup
+                Set peControlStyle to xtpButtonCaption
+                Set psCaption to C_$Remember
+                
+                Object oMenuItem is a cCJRememberFieldMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+                
+                Object oMenuItem is a cCJRememberLastFieldMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+                
+                Object oMenuItem is a cCJUnRememberFieldMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+                
+                Object oMenuItem is a cCJUnRememberFieldAllMenuItem
+                    Set peControlStyle to xtpButtonIconAndCaption
+                End_Object
+
+            End_Object
+
+        End_Object
+
+
+        Object oStatusBar is a cCJStatusBar
+            
+            Object oStatusPane1 is a cCJStatusBarPane
+                Set piID to sbpIDIdlePane
+                Set pbStyleStretch to True
+            End_Object
+    
+            Object oStatusPane2 is a cCJStatusBarPane
+                Set phoViewPane to Self
+                Set pbStyleStretch to True
+            End_Object
+    
+        End_Object
+    
+    End_Object
+
+    Object oClientArea is a ClientArea
+        Use Customer.vw
+        Use Invt.vw
+        Use Order.vw
+        Use SalesP.vw
+        Use Vendor.vw
+        
+        Use Basic\CustomerListBR.rv
+        Use Crystal\AddressLabelsCR.rv
+        Use Crystal\CustomerListCR.rv
+        Use Crystal\OrdersCR.rv
+        Use Crystal\OrdersByCustomerCR.rv
+        Use Crystal\ReportInformationCR.rv
+        Use Crystal\ReportPreviewCR.rv
+        Use WinPrint\CustomerListWP.rv
+        Use WinPrint\ItemsPerOrderWP.rv
+        Use WinPrint\OrdersWP.rv
+        Use WinPrint\OrdersByCustomerWP.rv
+
+        On_Key Key_Ctrl+Key_1 Send Activate_oCustomerView
+        On_Key Key_Ctrl+Key_2 Send Activate_oInventoryView
+        On_Key Key_Ctrl+Key_3 Send Activate_oOrderEntryView
+        On_Key Key_Ctrl+Key_4 Send Activate_oSalesPersonView
+        On_Key Key_Ctrl+Key_5 Send Activate_oVendorView
+        On_Key Key_Ctrl+Key_6 Send Activate_oCustomerListWP
+        On_Key Key_Ctrl+Key_7 Send Activate_oItemsPerOrderWP
+        On_Key Key_Ctrl+Key_8 Send Activate_oOrdersByCustomerWP
+        On_Key Key_Ctrl+Key_9 Send Activate_oOrdersWP
+
+        Use StdAbout.pkg
+    
+        Procedure Activate_About
+            Send DoAbout "Order Entry Sample Application" "17.0.1.0" "Copyright (c) 2010 Data Access Corporation" "Data Access Worldwide" ""
+        End_Procedure
+    
+    End_Object
+
+
+End_Object
+
+// open Order Entry view on application startup
+Send Activate_oOrderEntryView of (oClientArea(oMain))
+Start_UI

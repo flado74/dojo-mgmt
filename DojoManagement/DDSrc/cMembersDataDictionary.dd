@@ -1,0 +1,248 @@
+Use DataDict.pkg
+
+Open Members
+Open Dojos
+Open Shibu
+Open SysTable
+Open Payments
+Open PaymentsHeader
+Open RankHistory
+
+Object oRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Rokkyu"
+        Send Add_Table_Value "2" "Gokyu"
+        Send Add_Table_Value "3" "Yonkyu"
+        Send Add_Table_Value "4" "Sankyu"
+        Send Add_Table_Value "5" "Nikyu"
+        Send Add_Table_Value "6" "Ikkyu"
+        Send Add_Table_Value "7" "Shodan"
+        Send Add_Table_Value "8" "Nidan"
+        Send Add_Table_Value "9" "Sandan"
+        Send Add_Table_Value "10" "Yondan"
+        Send Add_Table_Value "11" "Godan"
+        Send Add_Table_Value "12" "Rokudan"
+        Send Add_Table_Value "13" "Nanadan"
+        Send Add_Table_Value "14" "Hachidan"
+        Send Add_Table_Value "15" "Kudan"
+    End_Procedure
+End_Object
+
+Object oBikenRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Chi no Maki"
+        Send Add_Table_Value "2" "Sui no Maki"
+        Send Add_Table_Value "3" "Ka no Maki"
+        Send Add_Table_Value "4" "Fu no Maki"
+        Send Add_Table_Value "5" "Ku no Maki"
+        Send Add_Table_Value "6" "Iai no Maki"
+        Send Add_Table_Value "7" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oNitoRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Ten no Maki"
+        Send Add_Table_Value "3" "Chi no Maki"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oJutteRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oTantoRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oKusariRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oMemberships is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "Associate Member"
+        Send Add_Table_Value "1" "Full Member"
+    End_Procedure
+End_Object
+
+Object oMemberType is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "Student"
+        Send Add_Table_Value "1" "Shibu-cho"
+        Send Add_Table_Value "2" "Dojo-cho"
+        Send Add_Table_Value "3" "Kancho"
+    End_Procedure
+End_Object
+
+Register_Object Dojos_sl
+Register_Object Shibu_sl
+Register_Object Members_sl
+
+Class cMembersDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to Members.File_Number
+        Set Add_Client_File to PaymentsHeader.File_Number
+        Set Add_Client_File to RankHistory.File_Number
+
+        Set Add_System_File to SysTable.File_Number DD_Lock_On_All
+
+        Set Add_Server_File to Dojos.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field Members.ID to File_Field SysTable.MEMBERS_ID
+        Set Field_Prompt_Object Field Members.ID to Members_sl
+        Set Field_Option Field Members.ID DD_COMMIT to True
+        Set Field_Option Field Members.ID DD_AUTOFIND to True
+
+        Set Field_Label_Long Field Members.FIRST_NAME to "First Name"
+        Set Field_Label_Short Field Members.FIRST_NAME to "First Name:"
+        Set Field_Class_Name Field Members.FIRST_NAME to "dbForm"
+        Set Field_Prompt_Object Field Members.FIRST_NAME to Members_sl
+
+        Set Field_Label_Long Field Members.LAST_NAME to "Last Name:"
+        Set Field_Label_Short Field Members.LAST_NAME to "Last Name:"
+        Set Field_Class_Name Field Members.LAST_NAME to "dbForm"
+        Set Field_Prompt_Object Field Members.LAST_NAME to Members_sl
+
+        Set Field_Label_Long Field Members.ADDRESS1 to "Address 1:"
+        Set Field_Label_Short Field Members.ADDRESS1 to "Address 1:"
+        Set Field_Class_Name Field Members.ADDRESS1 to "dbForm"
+
+        Set Field_Label_Long Field Members.ADDRESS2 to "Address 2:"
+        Set Field_Label_Short Field Members.ADDRESS2 to "Address 2:"
+        Set Field_Class_Name Field Members.ADDRESS2 to "dbForm"
+
+        Set Field_Label_Long Field Members.ADDRESS3 to "Address 3;"
+        Set Field_Label_Short Field Members.ADDRESS3 to "Address 3:"
+        Set Field_Class_Name Field Members.ADDRESS3 to "dbForm"
+
+        Set Field_Label_Long Field Members.EMAIL to "E-mail;"
+        Set Field_Label_Short Field Members.EMAIL to "E-mail:"
+        Set Field_Class_Name Field Members.EMAIL to "dbForm"
+        Set Field_Prompt_Object Field Members.EMAIL to Members_sl
+
+        Set Field_Label_Long Field Members.HOME_PHONE to "Phone:"
+        Set Field_Label_Short Field Members.HOME_PHONE to "Phone:"
+        Set Field_Class_Name Field Members.HOME_PHONE to "dbForm"
+
+        Set Field_Label_Long Field Members.MOBILE_PHONE to "Mobile:"
+        Set Field_Label_Short Field Members.MOBILE_PHONE to "Mobile:"
+        Set Field_Class_Name Field Members.MOBILE_PHONE to "dbForm"
+
+        Set Field_Label_Long Field Members.MEMBERSHIP to "Membership:"
+        Set Field_Label_Short Field Members.MEMBERSHIP to "Membership:"
+        Set Field_Class_Name Field Members.MEMBERSHIP to "dbComboForm"
+        Set Field_Value_Table Field Members.MEMBERSHIP to oMemberships
+
+        Set Field_Label_Long Field Members.INFO to "Info:"
+        Set Field_Label_Short Field Members.INFO to "Info:"
+        Set Field_Class_Name Field Members.INFO to "cDbTextEdit"
+
+        Set Field_Label_Long Field Members.MEMBER_TYPE to "Dojo-cho"
+        Set Field_Label_Short Field Members.MEMBER_TYPE to "Dojo-cho"
+        Set Field_Class_Name Field Members.MEMBER_TYPE to "dbComboForm"
+        Set Field_Value_Table Field Members.MEMBER_TYPE to oMemberType
+
+        Set Field_Prompt_Object Field Members.DOJO to Dojos_sl
+
+        Set Field_Prompt_Object Field Members.SHIBU to Shibu_sl
+
+        Set Field_Option Field Members.MEMBERSHIP_NO DD_COMMIT to True
+        Set Field_Label_Long Field Members.MEMBERSHIP_NO to "Member No"
+        Set Field_Label_Short Field Members.MEMBERSHIP_NO to "Member No:"
+        Set Field_Class_Name Field Members.MEMBERSHIP_NO to "dbForm"
+
+        Set Field_Option Field Members.PAYMENTS_TOTAL DD_DISPLAYONLY to True
+        Set Field_Mask_Type Field Members.PAYMENTS_TOTAL to Mask_Numeric_Window
+
+        Set Field_Mask_Type Field Members.RENEWAL_DATE to Mask_Date_Window
+
+        Set Field_Class_Name Field Members.ACTIVE_MEMBER to "dbCheckBox"
+        Set Field_Checkbox_Values Field Members.ACTIVE_MEMBER to "1" "0"
+
+        Set Field_Mask_Type Field Members.JOIN_DATE to Mask_Date_Window
+        Set Field_Option Field Members.JOIN_DATE DD_COMMIT to True
+
+        Set Field_Value_Table Field Members.BIKEN_RANK to oBikenRank
+        Set Field_Class_Name Field Members.BIKEN_RANK to "dbComboForm"
+
+        Set Field_Value_Table Field Members.NITO_RANK to oNitoRank
+        Set Field_Class_Name Field Members.NITO_RANK to "dbComboForm"
+
+        Set Field_Value_Table Field Members.JUTTE_RANK to oJutteRank
+        Set Field_Class_Name Field Members.JUTTE_RANK to "dbComboForm"
+
+        Set Field_Value_Table Field Members.TANTO_RANK to oTantoRank
+        Set Field_Class_Name Field Members.TANTO_RANK to "dbComboForm"
+
+        Set Field_Value_Table Field Members.KUSARI_RANK to oKusariRank
+        Set Field_Class_Name Field Members.KUSARI_RANK to "dbComboForm"
+
+        Set Field_Value_Table Field Members.JISSENKOBUDO_RANK to oRank
+        Set Field_Class_Name Field Members.JISSENKOBUDO_RANK to "dbComboForm"
+        Set Field_Option Field Members.JISSENKOBUDO_RANK DD_ZERO_SUPPRESS to True
+
+        Set Field_Label_Long Field Members.OCCUPATION to "Occupation"
+        Set Field_Label_Short Field Members.OCCUPATION to "Occupation"
+
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        If (Members.FULL_NAME = "") Begin
+            Move (Trim(Members.FIRST_NAME) + " " + (Trim(Members.LAST_NAME))) to Members.FULL_NAME
+        End
+    End_Procedure
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Changed_Value Field Members.ACTIVE_MEMBER to 1
+        Set Field_Changed_Value Field Members.JOIN_DATE to (Date(CurrentDateTime()))
+    End_Procedure
+
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+Use Members.sl
+Use Shibu.sl
+Use Dojos.sl
+#ENDIF

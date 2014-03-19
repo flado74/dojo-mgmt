@@ -1,0 +1,179 @@
+Use DataDict.pkg
+
+Open RankHistory
+Open Members
+Open SysTable
+Open Teachers
+
+Object oRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Rokkyu"
+        Send Add_Table_Value "2" "Gokyu"
+        Send Add_Table_Value "3" "Yonkyu"
+        Send Add_Table_Value "4" "Sankyu"
+        Send Add_Table_Value "5" "Nikyu"
+        Send Add_Table_Value "6" "Ikkyu"
+        Send Add_Table_Value "7" "Shodan"
+        Send Add_Table_Value "8" "Nidan"
+        Send Add_Table_Value "9" "Sandan"
+        Send Add_Table_Value "10" "Yondan"
+        Send Add_Table_Value "11" "Godan"
+        Send Add_Table_Value "12" "Rokudan"
+        Send Add_Table_Value "13" "Nanadan"
+        Send Add_Table_Value "14" "Hachidan"
+        Send Add_Table_Value "15" "Kudan"
+    End_Procedure
+End_Object
+
+Object oBikenRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Chi no Maki"
+        Send Add_Table_Value "2" "Sui no Maki"
+        Send Add_Table_Value "3" "Ka no Maki"
+        Send Add_Table_Value "4" "Fu no Maki"
+        Send Add_Table_Value "5" "Ku no Maki"
+        Send Add_Table_Value "6" "Iai no Maki"
+        Send Add_Table_Value "7" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oNitoRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Ten no Maki"
+        Send Add_Table_Value "3" "Chi no Maki"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oJutteRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oTantoRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Object oKusariRank is a DescriptionValidationTable
+    Procedure Fill_List
+        Forward Send Fill_List
+        Send Add_Table_Value "0" "..."
+        Send Add_Table_Value "1" "Kiso no Maki"
+        Send Add_Table_Value "2" "Kihon Gata"
+        Send Add_Table_Value "3" "Sabaki Gata"
+        Send Add_Table_Value "4" "Menkyo Kaiden"
+    End_Procedure
+End_Object
+
+Register_Function ValidateRankHistoryJISSEN_KOBUDO Integer iColumn Integer iValue Returns Boolean
+
+Class cRankHistoryDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to RankHistory.File_Number
+
+        Set Add_System_File to SysTable.File_Number DD_Lock_On_All
+
+        Set Add_Server_File to Members.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field RankHistory.ID to File_Field SysTable.RANKHISTORY_ID
+
+        Set Field_Mask_Type Field RankHistory.RANKDATE to Mask_Date_Window
+
+        Set Field_Value_Table Field RankHistory.JISSEN_KOBUDO to oRank
+        Set Field_Class_Name Field RankHistory.JISSEN_KOBUDO to "dbComboForm"
+        Set Field_Option Field RankHistory.JISSEN_KOBUDO DD_ZERO_SUPPRESS to True
+        Set Field_Validate_msg Field RankHistory.JISSEN_KOBUDO to get_ValidateRankHistoryJISSEN_KOBUDO
+
+        Set Field_Class_Name Field RankHistory.BIKEN to "dbComboForm"
+        Set Field_Value_Table Field RankHistory.BIKEN to oBikenRank
+
+        Set Field_Class_Name Field RankHistory.NITO to "dbComboForm"
+        Set Field_Value_Table Field RankHistory.NITO to oNitoRank
+
+        Set Field_Class_Name Field RankHistory.JUTTE to "dbComboForm"
+        Set Field_Value_Table Field RankHistory.JUTTE to oJutteRank
+
+        Set Field_Class_Name Field RankHistory.TANTO to "dbComboForm"
+        Set Field_Value_Table Field RankHistory.TANTO to oTantoRank
+
+        Set Field_Class_Name Field RankHistory.KUSARI to "dbComboForm"
+        Set Field_Value_Table Field RankHistory.KUSARI to oKusariRank
+
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        If ((Members.JISSENKOBUDO_RANK < RankHistory.JISSEN_KOBUDO) and (RankHistory.JISSEN_KOBUDO <> 0)) Begin 
+            Move RankHistory.JISSEN_KOBUDO to Members.JISSENKOBUDO_RANK
+        End
+        If ((Members.BIKEN_RANK < RankHistory.BIKEN) and (RankHistory.BIKEN <> 0)) Begin 
+            Move RankHistory.BIKEN to Members.BIKEN_RANK
+        End
+        If ((Members.NITO_RANK < RankHistory.NITO) and (RankHistory.NITO <> 0)) Begin 
+            Move RankHistory.NITO to Members.NITO_RANK
+        End
+        If ((Members.NITO_RANK < RankHistory.NITO) and (RankHistory.NITO <> 0)) Begin 
+            Move RankHistory.NITO to Members.NITO_RANK
+        End
+        If ((Members.TANTO_RANK < RankHistory.TANTO) and (RankHistory.TANTO <> 0)) Begin 
+            Move RankHistory.TANTO to Members.TANTO_RANK
+        End
+        If ((Members.JUTTE_RANK < RankHistory.JUTTE) and (RankHistory.JUTTE <> 0)) Begin 
+            Move RankHistory.JUTTE to Members.JUTTE_RANK
+        End
+        If ((Members.KUSARI_RANK < RankHistory.KUSARI) and (RankHistory.KUSARI <> 0)) Begin 
+            Move RankHistory.KUSARI to Members.KUSARI_RANK
+        End
+    End_Procedure
+
+    Procedure Backout
+        Forward Send Backout
+        If (OPERATION_MODE = MODE_DELETING) Begin
+            Move (RankHistory.JISSEN_KOBUDO - 1) to Members.JISSENKOBUDO_RANK
+        End
+    End_Procedure
+
+    Function ValidateRankHistoryJISSEN_KOBUDO Integer iColumn Integer iValue Returns Boolean
+        Clear RankHistory
+        Move 99 to RankHistory.ID
+        Move Members.ID to RankHistory.MEMBER_ID
+//        Repeat
+            Find lt RankHistory by Index.1
+            If ((Found) and (RankHistory.JISSEN_KOBUDO < iValue)) Begin
+                If ((RankHistory.JISSEN_KOBUDO - iValue) > 1) Begin
+                    Send UserError "Bara en st”rre!"
+                    Function_Return 1
+                End
+            End
+//        Until (not(Found))
+        Function_Return 0
+    End_Function
+
+End_Class

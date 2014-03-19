@@ -1,0 +1,193 @@
+//each button you need to execute something is associated with its own method using its ID
+    Procedure OnExecute_0 Variant vCommandBarControl  
+        Send Info_Box "falta iniciar iID"
+    End_Procedure
+
+//User Menu Items and its execute routine
+
+    Define ID_TeacherMenuItem for 76  //this ID identifies the OnExecute_ routines
+    Procedure OnExecute_76 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oTeachers of hoClient
+    End_Procedure
+
+    Define ID_MemberListMenuItem for 77  //this ID identifies the OnExecute_ routines
+    Procedure OnExecute_77 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oMemberList of hoClient
+    End_Procedure
+    
+    Define ID_MemberMenuItem for 78
+    Procedure OnExecute_78 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oMember of hoClient
+    End_Procedure
+    
+    Define ID_DojoMenuItem for 79
+    Procedure OnExecute_79 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oDojo of hoClient
+    End_Procedure
+    
+    Define ID_ShibuMenuItem for 80
+    Procedure OnExecute_80 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oShibu of hoClient
+    End_Procedure
+    
+    Define ID_Settings for 81
+    Procedure OnExecute_81 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oProperties of hoClient
+    End_Procedure
+
+    //This is a PopupMenu, doesnït have an execute routine (but it could have if you want)
+    Define ID_BasicReportsMenuItem for 88
+    
+    Define ID_FeesMenuItem for 90
+    Procedure OnExecute_90 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oRegisterFees of hoClient
+    End_Procedure
+    
+    Define ID_PaymentMenuItem for 91
+    Procedure OnExecute_91 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oRegisterFees of hoClient
+    End_Procedure
+    //This is a PopupMenu, doesnït have an execute routine (but it could have if you want)
+    Define ID_WinPrintReportsMenuItem for 92
+
+    Define ID_MembersReportMenuItem for 93
+    Procedure OnExecute_93 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+        Send Activate_oMemberListReport of hoClient
+    End_Procedure
+
+    Define ID_ItemsperOrderMenuItem for 94
+    Procedure OnExecute_94 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oItemsPerOrderWP of hoClient
+    End_Procedure
+
+    Define ID_OrdersbyCustomerMenuItem1 for 95
+    Procedure OnExecute Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oOrdersByCustomerWP of hoClient
+    End_Procedure
+
+    Define ID_OrdersbyOrderNumberMenuItem for 96
+    Procedure OnExecute_96 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oOrdersWP of hoClient
+    End_Procedure
+
+    //This is a PopupMenu, doesnït have an execute routine (but it could have if you want)
+    Define ID_CrystalReportsMenuItem for 99
+
+    Define ID_AddressLabelsMenuItem for 100
+    Procedure OnExecute_100 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oAddressLabelsCR of hoClient
+    End_Procedure
+
+    Define ID_CustomerListMenuItem1 for 101                
+    Procedure OnExecute_101 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oCustomerListCR of hoClient
+    End_Procedure
+
+    Define ID_OrdersbyCustomerMenuItem for 102
+    Procedure OnExecute_102 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oOrdersByCustomerCR of hoClient
+    End_Procedure
+    
+    Define ID_OrdersMenuItem for 103
+    Procedure OnExecute_103 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oOrdersCR of hoClient
+    End_Procedure
+
+    Define ID_ReportInformationMenuItem for 104
+    Procedure OnExecute_104 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oReportInformationCR of hoClient
+    End_Procedure
+
+    Define ID_CrystalReportsPreviewerMenuItem for 105                    
+    Procedure OnExecute_105 Variant vCommandBarControl
+        Handle hoClient
+        Get Client_Id to hoClient
+//        Send Activate_oReportPreviewCR of hoClient
+    End_Procedure
+
+    //this is the execute routine of each option of the MDI window that comes next.
+    Define ID_MyWindow          for 150
+    Procedure OnExecute_150 Variant vCommandBarControl
+        Handle hWindow hoControl
+        Get Create (RefClass(cCJCommandBarControl)) to hoControl
+        Set pvComObject of hoControl to vCommandBarControl
+        Get ComParameter of hoControl to hWindow
+//        Send Activate_View of hWindow
+    End_Procedure
+ 
+    //MDI Windows is a dynamic menu. It is created each time is called 
+    Define ID_MDIWindows         for 140
+    Procedure InitPopup_140 Variant llCommandBar Handle hoControl
+        Handle hoControls hClientArea hView hoControl0
+        Variant vControls vControl
+        String  sLabel sDescri
+        Integer icontrols i
+        Get pvComObject of hoControl to vControl
+        Get CreateSubControls of ghoRibbonBar vControl to hoControls
+        // Add all views to this menu. Create the action and add the item
+        Send ComDeleteAll of hoControls
+        Get Create (RefClass(cCJCommandBarControl)) to hoControl0
+        Get Client_Id to hClientArea // object id of client area
+        If (hClientArea > 0) Begin
+            Get Next_Mdi_Dialog of hClientArea True to hView // find first view
+            While (hView <> 0)
+                If (Active_State(hView)) Begin
+                    // create the action
+                    Get Label of hView to sLabel // caption bar (name) of view
+                    Move ("Make this view (" - trim(sLabel) - ") the active window.") to sDescri
+                    Get AddControl of ghoRibbonBar hoControls ID_MyWindow sLabel sDescri "Windows" sDescri "" False xtpControlButton xtpButtonCaption False to vControl
+                    Set pvComObject of hoControl0 to vControl
+                    If (current_scope(desktop)=hView and View_mode(hView)<>VIEWMODE_ICONIZE) Begin
+                        Set ComChecked of hoControl0 to True
+                    End
+                    Set ComParameter of hoControl0 to hView // used by custom OnExecute
+                End
+                Get Next_Mdi_Dialog of hClientArea False to hView // find next
+            Loop
+        End
+        Send Destroy of hoControl0
+        Send Destroy of hoControls
+    End_Procedure
+
+    Define ID_PrinterSetup       for 160
+    Procedure OnExecute_160 Variant vCommandBarControl
+       Boolean bSetupOk
+       Object oReport is a cWinReport2
+       End_Object
+       Get DFPrintSetupDialog of oReport to bSetupOk
+       Send Destroy of oReport
+    End_Procedure

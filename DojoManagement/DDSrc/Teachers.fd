@@ -1,0 +1,7 @@
+#REPLACE FILE9 Teachers
+#REPLACE Teachers.Recnum |FN9,0
+#REPLACE Teachers.ID |FN9,1
+#REPLACE Teachers.Name |FS9,2
+#REPLACE Teachers.Type |FN9,3
+#REPLACE Teachers.Rank |FN9,4
+#REPLACE Teachers.Dojo |FN9,5

@@ -1,0 +1,369 @@
+// cSTRibbonBar.pkg
+// Class cSTRibbonBar is a cCJRibbonBar
+// Ivan Schoof - 04/04/2012
+//
+// before Main Panel
+//      Use cSTRibbonBar.pkg
+// in   
+//      Procedure OnCreateCommandBars
+//          Forward Send OnCreateCommandBars
+//          ...
+//          Send CreateRibbon of oRibbonBar
+//      End_Procedure
+//
+// then create your menu
+//        Object oRibbonBar is a cSTRibbonBar
+//            Procedure CreateMenus Handle hoRibbonGroups Handle hoRibbonGroup Handle hoControls Variant vControl
+//               // insert tabs as first element of each menu
+//               Send InsertTab "&File" hoRibbonGroups "File Menu"
+//               // insert groups inside each tab
+//               Send AddGroup hoRibbonGroups hoRibbonGroup "Clear" "" ""
+//               // insert predefined menus into the groups
+//               Send StandardMenu (RefClass(cCJClearMenuItem)) hoRibbonGroup ID_ClearMenuItem True False False ""
+//               // or your own menus 
+//               Get AddControl hoRibbonGroup ID_CustomerEntryViewMenuItem "Customer Entry View" "Customer Entry View ... Ctrl+1" "Botones" "Add, edit and delete Customer data." "Customers.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+//               // or popup menus like this (xtpControlSplitButtonPopup)
+//               Get AddControl hoRibbonGroup ID_BasicReportsMenuItem "Basic Reports" "Basic Reports" "Botones" "Reports based on the Basic Report class." "Printer.ico" False xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow False to vControl
+//               // that can hold other submenus
+//               Get CreateSubControls vControl to hoControls
+//               // add options to this menus
+//               Get AddControl hoControls ID_CustomerListMenuItem "Customer List" "Customer List (Basic)" "Vistas" "Customer List (Basic)" "Report.ico" False xtpControlButton xtpButtonIconAndCaptionBelow False to vControl
+//               // you can create dynamic menu windows. In "MenuIDsAndExecutes.pkg" you define its creation method
+//               Get AddControl hoRibbonGroup ID_MDIWindows "Active Windows" "Active Windows" "Windows" "Active Windows" "Windows.ico" True xtpControlSplitButtonPopup xtpButtonIconAndCaptionBelow True to vControl
+//               // add a system button if you want 
+//               Get AddSystemButton "world.ico" to hoControls
+//               // and add options to this system button
+//               Get AddControl hoControls ID_CrystalReportsPreviewerMenuItem "Crystal Reports Previewer" "Crystal Reports Previewer" "Botones" "Select any Crystal Report to run in Preview." "Printer.ico" False xtpControlButton xtpButtonIconAndCaption False to vControl
+//               Get AddControl hoControls ID_PrinterSetup "Printer Setup" "Printer Setup" "Botones" "Printer Setup Dialog." "Printer.ico" False xtpControlButton xtpButtonIconAndCaption False to vControl
+//               Send StandardMenu (RefClass(cCJExitMenuItem)) hoControls ID_ExitMenuItem False True False "Exit.ico"
+//           End_Procedure
+//        End_Object
+//
+// in the file "MenuIDsAndExecutes.pkg" put your "execute events" for each option you have created   
+//    Define ID_CustomerEntryViewMenuItem for 77  //this ID identifies the OnExecute_ routines
+//    Procedure OnExecute_77 Variant vCommandBarControl
+//        Handle hoClient
+//        Get Client_Id to hoClient
+//        Send Activate_oCustomerView of hoClient
+//    End_Procedure
+//    //This is a PopupMenu, doesnït have an execute routine (but it could have if you want)
+//    Define ID_BasicReportsMenuItem for 88
+//    
+//    Define ID_CustomerListMenuItem for 90
+//    Procedure OnExecute_90 Variant vCommandBarControl
+//        Handle hoClient
+//        Get Client_Id to hoClient
+//        Send Activate_oCustomerListBR of hoClient
+//    End_Procedure
+//    Define ID_CrystalReportsPreviewerMenuItem for 105                    
+//    Procedure OnExecute_105 Variant vCommandBarControl
+//        Handle hoClient
+//        Get Client_Id to hoClient
+//        Send Activate_oReportPreviewCR of hoClient
+//    End_Procedure
+//    Define ID_PrinterSetup       for 160
+//    Procedure OnExecute_160 Variant vCommandBarControl
+//       Boolean bSetupOk
+//       Object oReport is a cWinReport2   //Use cWinReport2.pkg must be put somewhere before (not here)
+//       End_Object
+//       Get DFPrintSetupDialog of oReport to bSetupOk
+//       Send Destroy of oReport
+//    End_Procedure
+//    //MDI Windows is a dynamic menu. It is created each time is called 
+//    Define ID_MDIWindows         for 140
+//    Procedure InitPopup_140 Variant llCommandBar Handle hoControl
+//    
+//    
+
+
+//Standard Menu Items
+Define ID_ClearMenuItem            for 2001
+Define ID_ClearAllMenuItem         for 2002
+Define ID_PromptMenuItem           for 2003
+Define ID_FindMenuItem             for 2004
+Define ID_FindNextMenuItem         for 2005
+Define ID_FindPreviousMenuItem     for 2006
+Define ID_FindFirstMenuItem        for 2007
+Define ID_FindLastMenuItem         for 2008
+Define ID_SaveMenuItem             for 2009
+Define ID_DeleteMenuItem           for 2010
+Define ID_ExitMenuItem             for 2011
+Define ID_UndoMenuItem             for 2012
+Define ID_CutMenuItem              for 2013
+Define ID_CopyMenuItem             for 2014
+Define ID_PasteMenuItem            for 2015
+Define ID_DeleteEditMenuItem       for 2016
+Define ID_SelectAllMenuItem        for 2017
+Define ID_NextAreaMenu             for 2020 
+Define ID_PriorAreaMenu            for 2021
+Define ID_NextViewMenu             for 2022
+Define ID_PriorViewMenu            for 2023
+Define ID_PromptMenuItem           for 2024
+Define ID_ZoomMenuItem             for 2025
+Define ID_StatusbarMenuItem        for 2031
+Define ID_AutoArrangeIconsMenuItem for 2032
+Define ID_RestoreMenusMenuItem     for 2033
+Define ID_CascadeMenuItem          for 2034
+Define ID_TileHorizontally         for 2035
+Define ID_TileVertically           for 2036
+Define ID_MinimizeWindowsMenuItem  for 2037
+Define ID_RestoreWindowsMenuItem   for 2038
+Define ID_AutoArrangeIconsMenuItem for 2039
+Define ID_HelpMenuItem             for 2040
+Define ID_AboutMenuItem            for 2041
+Define ID_CutMenuItem              for 2042
+Define ID_CopyMenuItem             for 2043
+Define ID_PasteMenuItem            for 2044
+
+Use cCJCommandBarSystem.pkg
+Global_Variable Handle ghoRibbonBar
+
+//event sent by OnComExecute ... does nothing by default
+Procedure OnUnhandledExecute for cCJCommandBarSystem Variant vCommandBarControl  
+    Handle hoControl
+    Integer iExecute iMsgId
+    String sExecute
+    Get Create (RefClass(cCJCommandBarControl)) to hoControl
+    Set pvComObject of hoControl to vCommandBarControl
+    Get ComId of hoControl to iExecute
+    Move ("msg_OnExecute_" - String(iExecute)) to sExecute
+    Move 0 to LastErr
+    Send Ignore_Error of Error_Object_Id 54
+    Move (Eval(sExecute)) to iMsgId
+    Send Trap_Error of Error_Object_Id 54
+    If (LastErr=0) Send iMsgId of ghoRibbonBar vCommandBarControl
+End_Procedure
+    
+//event sent by OnComInitCommandsPopup ... does nothing by default
+Procedure OnUnhandledInitCommandsPopup for cCJCommandBarSystem Variant llCommandBar
+    Handle hoControl
+    Variant vControl vCommandBar
+    Variant[] vDynamicControls
+    Integer i iPopup iMsgId
+    String sExecute
+    Get Create (RefClass(cCJCommandBarControl)) to hoControl
+    Get pvDynamicCcontrols of ghoRibbonBar to vDynamicControls
+    For i from 0 to (SizeOfArray(vDynamicControls)-1)
+       Move vDynamicControls[i] to vControl
+       Set pvComObject of hoControl to vControl
+       Get ComCommandBar of hoControl to vCommandBar
+       If (IsSameComObject(vCommandBar,llCommandBar)) Begin
+          Get ComId of hoControl to iPopup
+          Move ("msg_InitPopup_" - String(iPopup)) to sExecute
+          Move 0 to LastErr
+          Send Ignore_Error of Error_Object_Id 54
+          Move (Eval(sExecute)) to iMsgId
+          Send Trap_Error of Error_Object_Id 54
+          If (LastErr=0) Send iMsgId of ghoRibbonBar llCommandBar hoControl
+          Move (SizeOfArray(vDynamicControls)) to i
+       End
+    Loop
+    Send Destroy of hoControl
+End_Procedure
+
+//ComDeleteAll erases all ribbonbar tabs, groups and items. Must be nulled
+Procedure RestoreLayout for cCJCommandBarSystem
+     Variant vToolBarObject vRibbonBar
+     //Send ComDeleteAll //this erase all ribbonbar tabs and groups
+     //Get ComAddMenuBar "Main menu" to vToolbarObject
+     //Broadcast Send CreateComCommandBarInstance
+     //Broadcast Send CreateComInstance
+     Send ComRecalcLayout
+     Send ComRedrawBar of ghoRibbonBar
+     Send ComRecalcLayout of ghoRibbonBar
+End_Procedure
+   
+Class cSTRibbonBar is a cCJRibbonBar
+   Procedure Construct_Object
+       Forward Send Construct_Object 
+       Property Variant[] pvDynamicCcontrols
+   End_Procedure    
+
+   Procedure CreateRibbon
+
+       Handle hoCommandBars 
+       Variant vRibbonBar vControl
+       Handle hoRibbonGroup hoRibbonGroups hoControls
+
+       Move Self to ghoRibbonBar
+
+       Get CommandBarSystemObject to hoCommandBars
+       Get ComAddRibbonBar of hoCommandBars "MyRibbonBar" to vRibbonBar
+       Set pvComObject to vRibbonBar
+       Send ComEnableDocking xtpFlagStretched
+ 
+       Get Create (RefClass(cCJRibbonGroup)) to hoRibbonGroup
+       Get Create (RefClass(cCJRibbonGroups)) to hoRibbonGroups
+
+       Send CreateMenus hoRibbonGroups hoRibbonGroup hoControls vControl
+       
+       If hoRibbonGroups Send Destroy of hoRibbonGroups
+       If hoRibbonGroup Send Destroy of hoRibbonGroup
+      
+       Send ComRecalcLayout
+       Send ComRedrawBar  
+
+   End_Procedure  
+
+   Procedure CreateMenus Handle hoRibbonGroups Handle hoRibbonGroup Handle hoControls Variant vControl
+   End_Procedure 
+
+   Use MenuIDsAndExecutes.pkg
+
+   Procedure InsertTab String sCaption Handle hoRibbonGroups String sTooltip Boolean bDefaultTab
+        Handle hoRibbonTab
+        Variant vRibbonTab vRibbonGroups
+        Integer icount
+        Get ComTabCount to icount
+        Get ComInsertTab (icount+1) sCaption to vRibbonTab
+        Get Create (RefClass(cCJRibbonTab)) to hoRibbonTab
+        Set pvComObject of hoRibbonTab to vRibbonTab
+        If (sTooltip>"") Set ComToolTip of hoRibbonTab to sTooltip
+        Get ComGroups of hoRibbonTab to vRibbonGroups
+        Set pvComObject of hoRibbonGroups to vRibbonGroups
+        If (bDefaultTab) Set ComSelectedTab of hoRibbonTab to vRibbonTab
+        Send Destroy of hoRibbonTab
+   End_Procedure  
+
+   Procedure AddGroup Handle hoRibbonGroups Handle hoRibbonGroup String sCaption String sTooltip String sDescription
+        Variant vRibbonGroup vControl
+        Integer icount
+        Handle hoControl
+        Get ComGroupCount of hoRibbonGroups to icount
+        Get ComAddGroup of hoRibbonGroups sCaption (icount+1) to vRibbonGroup
+        Set pvComObject of hoRibbonGroup to vRibbonGroup
+        If ( (sTooltip>"") or (sDescription>"") ) Begin
+            Set ComShowOptionButton of hoRibbonGroup to True
+            Get ComControlGroupOption of hoRibbonGroup to vControl
+            Get Create (RefClass(cCJCommandBarControl)) to hoControl
+            Set pvComObject of hoControl to vControl
+            Set ComTooltipText of hoControl to sTooltip
+            Set ComDescriptionText of hoControl to sDescription
+            Send Destroy of hoControl
+        End
+   End_Procedure
+
+   Procedure StandardMenu Integer U_Class Handle hoRibbonGroup Integer iID Boolean bAddToDesigner Boolean bBeginGroup Boolean bQuickAccess String sIco
+        Variant vAction vControl
+        Handle hoControl hoAction hmenu
+        String sCaption
+        Integer icount
+        Get Create U_Class to hmenu
+        Set pbAddToDesignerMenu of hmenu to bAddToDesigner
+        Get Create (RefClass(cCJCommandBarControl)) to hoControl
+        Send CreateComAction of hmenu
+        Get pvComObject of hmenu to vAction
+        Get ComCount of hoRibbonGroup to icount
+        Get ComAdd of hoRibbonGroup xtpControlButton iID "" (icount+1) False to vControl
+        Set pvComObject of hoControl to vControl
+        Set ComAction of hoControl to vAction    
+        Set ComBeginGroup of hoControl to bBeginGroup
+        If ( (sIco>"") or bQuickAccess) Begin
+           Get Create (RefClass(cCJAction)) to hoAction
+           Set pvComObject of hoAction to vAction
+        End
+        If (sIco>"") Begin
+           Get AddImageType True sIco iID xtpImageNormal to iID
+           Set ComIconId of hoAction to iID
+        End
+        If bQuickAccess Begin
+            Get ComCaption of hoAction to sCaption
+            Send AddQuickAccess xtpControlButton iID sCaption vAction False
+        End
+        If hoAction Send Destroy of hoAction
+        Send Destroy of hoControl           
+   End_Procedure
+   
+   Function AddControl Handle hoRibbonGroup Integer iID String sCaption String sDescri String sCat String sTool String sIco Boolean bQuickAccess XTPControlType iControl XTPButtonStyle iStyle Boolean bDynamic Returns Variant
+        Integer icount
+        Handle hoControl
+        Variant vControl
+        Variant[] vDynamicControls
+        Get Create (RefClass(cCJCommandBarControl)) to hoControl
+        Get ComCount of hoRibbonGroup to icount
+        Get ComAdd of hoRibbonGroup iControl iID sCaption (icount+1) False to vControl
+        Set pvComObject of hoControl to vControl
+        Set ComDescriptionText of hoControl to sDescri
+        Set ComCategory of hoControl to sCat
+        Set ComTooltipText of hoControl to sTool
+        Set ComStyle of hoControl to iStyle
+        If (sIco>"") Get AddImageType True sIco iID xtpImageNormal to iID
+        Send Destroy of hoControl
+        If bDynamic Begin
+           Get pvDynamicCcontrols to vDynamicControls
+           Move (NullComObject()) to vDynamicControls[SizeOfArray(vDynamicControls)]
+           Move vControl to vDynamicControls[SizeOfArray(vDynamicControls)-1]
+           Set pvDynamicCcontrols to vDynamicControls
+        End
+        If bQuickAccess Send AddQuickAccess iControl iID sCaption (NullComObject()) bDynamic
+        Function_Return vControl
+   End_Function
+   
+   Function AddSystemButton String sIco Returns Handle
+       Variant vControl
+       Handle hoControls hoControl 
+       Integer iID
+       Get ComAddSystemButton to vControl
+       If (sIco>"") Begin
+          Get AddImageType True sIco iID xtpImageNormal to iID
+          Get Create (RefClass(cCJCommandBarControl)) to hoControl
+          Set pvComObject of hoControl to vControl
+          Set ComIconId of hoControl to iID
+       End
+       Get CreateSubControls vControl to hoControls
+       if hoControl Send Destroy of hoControl
+       Function_Return hoControls
+   End_Function
+   
+   Procedure AddQuickAccess XTPControlType iControl Integer iID String sCaption Variant vAction Boolean bDynamic
+        Integer icount
+        Handle hoControls hoControl 
+        Variant vControls vControl
+        Variant[] vDynamicControls
+        Get Create (RefClass(cCJCommandBarControls)) to hoControls
+        Get ComQuickAccessControls to vControls
+        Set pvComObject of hoControls to vControls
+        Get ComCount of hoControls to icount
+        Get ComAdd of hoControls iControl iID sCaption (icount+1) False to vControl
+        If (not(IsNullComObject(vAction))) Begin
+           Get Create (RefClass(cCJCommandBarControl)) to hoControl
+           Set pvComObject of hoControl to vControl
+           Set ComAction of hoControl to vAction
+           Send Destroy of hoControl 
+        End
+        If bDynamic Begin
+           Get pvDynamicCcontrols to vDynamicControls
+           Move (NullComObject()) to vDynamicControls[SizeOfArray(vDynamicControls)]
+           Move vControl to vDynamicControls[SizeOfArray(vDynamicControls)-1]
+           Set pvDynamicCcontrols to vDynamicControls
+        End
+        Send Destroy of hoControls
+   End_Procedure
+
+   Function CreateSubControls Variant vControl Returns Handle
+        Handle hoControl hoCommandBar hoControls
+        Variant vCommandBar vControls
+        Get Create (RefClass(cCJCommandBarControl)) to hoControl
+        Set pvComObject of hoControl to vControl
+        Get ComCommandBar of hoControl to vCommandBar
+        Get Create (RefClass(cCJCommandBar)) to hoCommandBar
+        Set pvComObject of hoCommandBar to vCommandBar
+        Get ComControls of hoCommandBar to vControls
+        Get Create (RefClass(cCJCommandBarControls)) to hoControls
+        Set pvComObject of hoControls to vControls
+        Send Destroy of hoCommandBar
+        Send Destroy of hoControl
+        Function_Return hoControls
+   End_Function
+   
+   Function CreateMenuControls Returns Handle
+        Handle hoControls
+        Variant vControls
+        Get ComControls to vControls
+        Get Create (RefClass(cCJCommandBarControls)) to hoControls
+        Set pvComObject of hoControls to vControls
+        Function_Return hoControls
+   End_Function
+           
+End_Class
+   

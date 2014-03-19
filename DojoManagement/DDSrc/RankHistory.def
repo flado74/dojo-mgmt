@@ -1,0 +1,51 @@
+-----------------------------------------------------------------------------
+  DATE: 2013-12-31      TIME: 12:34                                  PAGE:  1
+  FILE DEFINITION FOR FILE: RankHistory (# 7)
+-----------------------------------------------------------------------------
+  DRIVER NAME               : DATAFLEX
+  FILE ROOT NAME            : RankHistory
+  USER DISPLAY NAME         : RankHistory
+  DATAFLEX FILE NAME        : RankHistory
+-----------------------------------------------------------------------------
+  RECORD LENGTH             : 42        ( USED: 14 )
+  MAX NUMBER OF RECORDS     : 10000     ( USED: 43 )
+  FILE COMPRESSION          : NONE
+  RE-USE DELETED SPACE      : YES
+  LOCKING TYPE              : FILE
+  HEADER INTEGRITY CHECKING : YES
+  TRANSACTION TYPE          : CLIENT ATOMIC
+  RECORD IDENTITY INDEX     : 0 ( 0 , 0 )
+  FILE LOGIN PARAMETER      : 
+  SYSTEM FILE               : NO 
+-----------------------------------------------------------------------------
+
+NUM  FIELD NAME       TYPE SIZE  OFFST IX   RELATES TO FILE.FIELD
+---  ---------------  ---- ----- ----- --   ---------------------------------
+  1  ID               NUM    2.0     1  1   
+  2  MEMBER_ID        NUM    4.0     2  1   Members.FIELD_1 (1,1)
+  3  RANKDATE         DAT      6     4  2   
+  4  JISSEN_KOBUDO    NUM    2.0     7  3   
+  5  BIKEN            NUM    2.0     8      
+  6  NITO             NUM    2.0     9      
+  7  JUTTE            NUM    2.0    10      
+  8  TANTO            NUM    2.0    11      
+  9  KUSARI           NUM    2.0    12      
+ 10  EXAMINER         NUM    4.0    13  4   Teachers.FIELD_1 (9,1)
+
+
+INDEX# FIELDS          DES U/C    LENGTH LEVELS SEGMENTS MODE
+------ --------------- --- ---    ------ ------ -------- -------
+  1    ID              NO  NO       3      2       2     ON-LINE
+       MEMBER_ID       NO  NO 
+
+  2    RANKDATE        YES NO       6      3       3     ON-LINE
+       ID              NO  NO 
+       MEMBER_ID       NO  NO 
+
+  3    JISSEN_KOBUDO   NO  NO       4      2       3     ON-LINE
+       ID              NO  NO 
+       MEMBER_ID       NO  NO 
+
+  4    EXAMINER        NO  NO       3      2       2     ON-LINE
+       ID              NO  NO 
+

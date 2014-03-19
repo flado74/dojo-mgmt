@@ -1,0 +1,39 @@
+Use DataDict.pkg
+
+Open Dojos
+Open Shibu
+Open Members
+Open SysTable
+Open Teachers
+
+Register_Object Dojos_sl
+
+Class cDojosDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to Dojos.File_Number
+
+        Set Add_System_File to SysTable.File_Number DD_Lock_On_All
+
+        Set Add_Client_File to Shibu.File_Number
+        Set Add_Client_File to Members.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Prompt_Object Field Dojos.ID to Dojos_sl
+        Set Field_Auto_Increment Field Dojos.ID to File_Field SysTable.DOJO_ID
+
+        Set Field_Prompt_Object Field Dojos.NAME to Dojos_sl
+
+    End_Procedure
+
+End_Class
+
+#IFDEF Is$WebApp
+#ELSE
+Use Dojos.sl
+#ENDIF

@@ -1,0 +1,4 @@
+#REPLACE FILE2 Dojos
+#REPLACE Dojos.Recnum |FN2,0
+#REPLACE Dojos.ID |FN2,1
+#REPLACE Dojos.NAME |FS2,2

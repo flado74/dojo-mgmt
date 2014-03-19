@@ -1,0 +1,25 @@
+-----------------------------------------------------------------------------
+  DATE: 2012-04-08      TIME: 23:30                                  PAGE:  1
+  FILE DEFINITION FOR FILE: SysTable (# 4)
+-----------------------------------------------------------------------------
+  DRIVER NAME               : DATAFLEX
+  FILE ROOT NAME            : SysTable
+  USER DISPLAY NAME         : SysTable
+  DATAFLEX FILE NAME        : SysTable
+-----------------------------------------------------------------------------
+  RECORD LENGTH             : 8         ( USED: 6 )
+  MAX NUMBER OF RECORDS     : 1         ( USED: 0 )
+  FILE COMPRESSION          : NONE
+  RE-USE DELETED SPACE      : YES
+  LOCKING TYPE              : FILE
+  HEADER INTEGRITY CHECKING : YES
+  TRANSACTION TYPE          : CLIENT ATOMIC
+  RECORD IDENTITY INDEX     : 0 ( 0 , 0 )
+  FILE LOGIN PARAMETER      : 
+  SYSTEM FILE               : YES
+-----------------------------------------------------------------------------
+
+NUM  FIELD NAME       TYPE SIZE  OFFST IX   RELATES TO FILE.FIELD
+---  ---------------  ---- ----- ----- --   ---------------------------------
+  1  MEMBERS_ID       NUM   12.0     1      
+

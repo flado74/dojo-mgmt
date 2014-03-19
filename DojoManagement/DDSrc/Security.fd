@@ -1,0 +1,5 @@
+#REPLACE FILE8 Security
+#REPLACE Security.Recnum |FN8,0
+#REPLACE Security.ID |FN8,1
+#REPLACE Security.UserID |FS8,2
+#REPLACE Security.Password |FS8,3

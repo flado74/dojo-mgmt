@@ -1,0 +1,44 @@
+Use DataDict.pkg
+
+Open PaymentsHeader
+Open Members
+Open Payments
+
+Class cPaymentsHeaderDataDictionary is a DataDictionary
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+        Set Main_File to PaymentsHeader.File_Number
+
+        Set Add_Client_File to Payments.File_Number
+
+        Set Add_Server_File to Members.File_Number
+
+        Set Foreign_Field_Option DD_KEYFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_KEYFIELD DD_FINDREQ to True
+        Set Foreign_Field_Option DD_INDEXFIELD DD_NOPUT to True
+        Set Foreign_Field_Option DD_DEFAULT DD_DISPLAYONLY to True
+
+        Set Field_Auto_Increment Field PaymentsHeader.ID to File_Field Members.PAYMENTS_ID
+
+        Set Field_Mask_Type Field PaymentsHeader.PAYMENT_DATE to Mask_Date_Window
+
+        Set Field_Mask_Type Field PaymentsHeader.TOTAL to Mask_Numeric_Window
+        Set Field_Option Field PaymentsHeader.TOTAL DD_DISPLAYONLY to True
+
+    End_Procedure
+
+    Procedure Update
+        Forward Send Update
+        Move (Members.PAYMENTS_TOTAL + PaymentsHeader.TOTAL) to Members.PAYMENTS_TOTAL
+    End_Procedure
+
+    Procedure Backout
+        Move (Members.PAYMENTS_TOTAL - PaymentsHeader.TOTAL) to Members.PAYMENTS_TOTAL
+    End_Procedure
+
+    Procedure Field_Defaults
+        Forward Send Field_Defaults
+        Set Field_Changed_Value Field PaymentsHeader.PAYMENT_DATE to (Date(CurrentDateTime()))
+    End_Procedure
+End_Class

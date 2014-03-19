@@ -1,0 +1,26 @@
+Use cSigCjReportControl.pkg
+
+Class cDojoCjReportControl is a cSigCjReportControl
+    
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+    End_Procedure
+
+    Procedure End_Construct_Object
+        Forward Send End_Construct_Object
+
+    End_Procedure
+    
+    Procedure OnCreate
+        Handle hoGlobalSettings hoResourceImages
+        Boolean bOK
+        Get Create (RefClass(cSigCjComReportControlGlobalSettings)) to hoGlobalSettings
+        Send CreateComObject of hoGlobalSettings
+        Get Create (RefClass(cSigCjComResourceImages)) to hoResourceImages
+        Set pvComObject of hoResourceImages to (ComResourceImages(hoGlobalSettings))
+        Get ComLoadFromFile of hoResourceImages "Office2010.dll" "Office2010Black.ini" to bOk
+        Forward Send OnCreate
+    End_Procedure
+
+End_Class
